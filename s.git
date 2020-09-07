@@ -1,0 +1,11 @@
+.gitconfig
+[user]
+	name = bernhardtj
+	email = 31599460+bernhardtj@users.noreply.github.com
+[merge]
+	guitool = meld
+[diff]
+	tool = kitty +kitten diff
+	guitool = meld
+[hub]
+	protocol = https

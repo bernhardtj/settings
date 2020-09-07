@@ -1,0 +1,133 @@
+# Settings/apply
+# A simple dotfiles manager. Similar in function to stow(1) but more useful.
+#
+# There are two types of dotfiles: settings and scripts.
+#
+# Settings are files named s.<name> in the $SETTINGS_DIR, and
+# have their installation path relative to $HOME on the first line.
+#
+# Scripts are files named [0-9][0-9].<name> and start with a shebang.
+# This program parses the shebang so that the script need not be executable.
+# The second line is a commented command whose exit status determines
+# if the file is run.
+#
+# The Settings are installed between Script Nº 49 and Script Nº 50.
+#
+# Dependencies:
+# - zsh (optional)
+
+usage() {
+    cat <<EOF
+usage: $(basename "$0") [options]
+
+options:
+    -h                   Show this message
+    -v                   Turn on debugging information
+    -r [<remote>]        Provision remotes (disabled for now)
+
+EOF
+    exit "$@"
+}
+
+log() {
+    [[ VERBOSITY -ge $1 ]] && shift 1 && echo "$@"
+}
+
+warn() {
+    log "$@" >&2
+}
+
+run_scripts() {
+    for script in "$@"; do
+        test -e "$script" || continue
+        log 3 "scripts: found $script"
+        conditional=$(head -n2 "$script" | tr '\n' '#' | cut -d '#' -f4)
+        interpreter=$(head -n2 "$script" | tr '\n' '#' | cut -d '#' -f2 | tr -d '!')
+        log 2 "scripts: will execute $(basename "$script" | cut -d '.' -f1) if $conditional"
+        if [[ -n $conditional ]] && bash -c "${conditional//\$/$}"; then
+            log 1 "-> executing $(basename "$script" | cut -d '.' -f2)"
+            log 2 "+ $interpreter $script"
+            $interpreter "$script" | while read -r line; do
+                log 1 "$(basename "$script" | cut -d '.' -f2): $line"
+            done
+        else
+            log 2 "scripts: skipping $script"
+        fi
+    done
+}
+
+DEFAULT_REMOTES_LIST=(lxplus.cern.ch)
+
+SETTINGS_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+SETTINGS_LOCK_DIR=$SETTINGS_DIR/.lock
+
+[[ -z $SSH ]] && SSH=/usr/bin/ssh
+[[ -z $SCP ]] && SCP=/usr/bin/scp
+
+REMOTES=
+VERBOSITY=0
+
+while getopts ":hdv:r:" OPTION; do
+    case $OPTION in
+    h)
+        usage 0
+        ;;
+    v)
+        [[ $OPTARG =~ ^v*$ ]] && VERBOSITY=$((${#OPTARG} + 1)) || VERBOSITY=1
+        ;;
+    r)
+        REMOTES=$OPTARG
+        ;;
+    *)
+        case $OPTARG in
+        v)
+            VERBOSITY=1
+            ;;
+        r)
+            REMOTES=("${DEFAULT_REMOTES_LIST[@]}")
+            ;;
+        *)
+            warn 0 "Option -$OPTARG requires an argument."
+            usage 1
+            ;;
+        esac
+        ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+[[ $# -ne 0 ]] && usage 1
+
+[[ $VERBOSITY -ge 4 ]] && set -x
+
+log 1 This is Settings/apply improved.
+
+log 1 '==>' Running Pre Scripts...
+run_scripts "$SETTINGS_DIR"/[0-4][0-9].*
+
+log 1 '==>' Unlocking Old Settings...
+rm -rf "$SETTINGS_LOCK_DIR"
+(zsh -c "rm -- $HOME/**(-@D)" || find ~ -xtype l -delete) 2>/dev/null
+mkdir -p "$SETTINGS_LOCK_DIR"
+
+log 1 '==>' Applying New Settings...
+for setting in "$SETTINGS_DIR"/s.*; do
+    test -e "$setting" || continue
+    log 3 "settings: found $setting"
+    read -r firstline <"$setting"
+    target=${firstline#*\ } # strip comment
+    lock=$SETTINGS_LOCK_DIR/$(basename "$setting")
+    if [[ "$firstline" == "$target" ]]; then
+        tail -n+2 "$setting" >"$lock"
+    else
+        cp "$setting" "$lock"
+    fi
+    log 3 "settings: locked $setting"
+    log 1 "-> installing $(basename "$setting" | cut -d '.' -f2) locally"
+    log 2 "$(basename "$setting") -> $target"
+    mkdir -p "$HOME/$(dirname "$target")"
+    ln -sf "$lock" "$HOME/$target"
+done
+
+log 1 '==>' Running Post Scripts...
+run_scripts "$SETTINGS_DIR"/[5-9][0-9].*

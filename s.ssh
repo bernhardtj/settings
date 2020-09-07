@@ -1,0 +1,158 @@
+# .ssh/config
+
+Host ligo.mit.edu *.caltech.edu
+    User jacob.bernhardt
+
+# from https://twiki.cern.ch/twiki/bin/view/Main/Kerberos
+# Allow short host names
+# You can add further CERN hosts to the next line
+Host !*.cern.ch lxplus* aisplus* 
+    CanonicalizeHostname yes
+    CanonicalDomains cern.ch
+
+Host *.cern.ch
+    User jabernha
+    Compression yes
+    ForwardX11 yes
+    # Forward you SSH key agent so that it can be used on further hops
+    ForwardAgent yes
+    # Allow login per Kerberos
+    GSSAPIAuthentication yes
+    # Transmit AFS token
+    GSSAPIDelegateCredentials yes
+    # Needed for non FQDNs
+    GSSAPITrustDNS yes
+
+# lxplus is a cluster with a shared private ssh key
+# stop it from flodding your known_hosts and asking
+# every time to check the private key
+Host lxplus*.cern.ch aisplus*.cern.ch
+    HostKeyAlias cernlxpluskey
+    UserKnownHostsFile ~/.ssh/known_hosts.lxplus
+
+Host cmsusr cmsusr* cmsusr*.cms
+    # Specify the remote username if different from your local one
+    User jabernha
+    # Use SSHv2 only
+    Protocol 2
+    # Forward you SSH key agent so that it can be used on further hops
+    ForwardAgent yes
+    # For X11
+    #ForwardX11 yes
+    #ForwardX11Trusted no
+
+    # Go through lxplus so that it works from wherever you are
+    ProxyCommand ssh lxplus nc %h 22
+
+    # Setup a SOCKS5 proxy on local port 1080 so that you can easily browse internal CMS web sites
+    DynamicForward 1080
+
+    # Setup port forwarding for the General X2GO server (point your X2GO client to local port 6122 for x2go01)
+    LocalForward 6122 x2go01:22
+    # Same as above for x2go02
+    LocalForward 6222 x2go02:22
+    # Same as above for cc7x2go03
+    LocalForward 6322 cc7x2go03:22
+    # Same as above for cc7x2go04
+    LocalForward 6422 cc7x2go04:22
+    # Same as above for x2go05
+    LocalForward 6522 x2go05:22
+    # Same as above for x2go06
+    LocalForward 6622 x2go06:22
+
+    # DAQ OnCall settings (DB and daqweb)
+    # For connection to the DB, from outside use the tnsnames.ora file provided where this file was provided
+    LocalForward 10121 cmsonr1-v.cms:10121
+    LocalForward 10122 cmsonr2-v.cms:10121
+    LocalForward 10123 cmsonr3-v.cms:10121
+    LocalForward 10124 cmsonr4-v.cms:10121
+    LocalForward 10125 cmsintr1-v.cms:10121
+    LocalForward 10126 cmsintr2-v.cms:10121
+    LocalForward 45679 cmsdaqweb.cms:45679
+    # DAQ OnCall X2GO servers
+    # For x2godaq1
+    LocalForward 7122 x2godaq1:22
+    # For x2godaq2 or x2gosysadmin
+    LocalForward 7222 x2godaq2:22
+
+    # Windows remote desktop forwarding
+    #LocalForward 5001 mywindows_machine:3389
+    # VNC port forwarding (add as many as you want)
+    #LocalForward 5902 mymaccomputer:5900
+    #Extra port to use the apple remote desktop
+    #LocalForward 3283 mymaccomputer:3283
+
+
+# Direct connection to cmsnx, any .cms machine, any IP of .cms
+Host x2go* cc7x2go* *.cms 10.176.*.*
+    # Specify the remote username if different from your local one
+    User jabernha
+    # Use SSHv2 only
+    Protocol 2
+    # Forward you SSH key agent so that it can be used on further hops
+    ForwardAgent yes
+    # For X11
+    #ForwardX11 yes
+    #ForwardX11Trusted no
+
+    # Go through the cmsusr connection
+    ProxyCommand ssh cmsusr nc %h 22
+
+Host cms904usr
+    # Specify the remote username if different from your local one
+    User jabernha
+    # Use SSHv2 only
+    Protocol 2
+    # Forward you SSH key agent so that it can be used on further hops
+    ForwardAgent yes
+    # For X11
+    #ForwardX11 yes
+    #ForwardX11Trusted no
+
+    # Go through lxplus so that it works from wherever you are
+    ProxyCommand ssh lxplus nc %h 22
+
+    # Setup a SOCKS5 proxy on local port 1081 so that you can easily browse internal 904 web sites
+    DynamicForward 1081
+
+    # Setup port forwarding for the NX server (point your NX client to local port 5022 for cms904nx0)
+    LocalForward 5022 cms904nx0:22
+    # Same as above for cms904nx1
+    #LocalForward 5122 cms904nx1:22
+    # Same as above for cms904nx2
+    #LocalForward 5222 cms904nx2:22
+
+    # Setup port forwarding for the General X2GO server (point your X2GO client to local port 7122 for cms904x2go)
+    LocalForward 7122 cms904x2go:22
+
+    # DAQ OnCall settings
+
+    # Windows remote desktop forwarding
+    #LocalForward 5001 mywindows_machine:3389
+    # VNC port forwarding (add as many as you want)
+    #LocalForward 5902 mymaccomputer:5900
+    #Extra port to use the apple remote desktop
+    #LocalForward 3283 mymaccomputer:3283
+
+# Direct connection to cms904nx, any .cms904 machine, any IP of .cms904
+Host cms904nx* cms904x2go* *.cms904 10.192.*.*
+    # Specify the remote username if different from your local one
+    User jabernha
+    # Use SSHv2 only
+    Protocol 2
+    # Forward you SSH key agent so that it can be used on further hops
+    ForwardAgent yes
+    # For X11
+    #ForwardX11 yes
+    #ForwardX11Trusted no
+
+    # Go through the cms904usr connection
+    ProxyCommand ssh cms904usr nc %h 22
+
+# deactivate multiplexing because of a possible incompatibility with svn
+Host svn.cern.ch
+    ControlMaster no
+    # Specify the remote username if different from your local one
+    User jabernha
+    # Use SSHv2 only
+    Protocol 2
