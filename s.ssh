@@ -1,5 +1,15 @@
 # .ssh/config
 
+Host *discovery*
+    User bernhardt.j
+
+Host alpha* beta* zeta* eta* theta* iota* degrees*
+    User bernhardtj
+    Port 27
+
+Host gateway*
+    User bernhardtj
+
 Host ligo.mit.edu *.caltech.edu
     User jacob.bernhardt
 
