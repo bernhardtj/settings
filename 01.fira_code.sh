@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# true
+# test -n "$DISPLAY"
 # see https://github.com/tonsky/FiraCode/wiki/Linux-instructions
 
 fonts_dir="${HOME}/.local/share/fonts"

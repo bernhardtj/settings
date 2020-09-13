@@ -6,6 +6,17 @@ if ! [[ "$PATH" =~ $HOME/.local/bin:$HOME/bin: ]]; then
 fi
 export PATH
 
+_wrap_update_prompt_once() {
+    local lockfile="$HOME/.cache/aliases/updater-blacklist"
+    mkdir -p "$(dirname "$lockfile")"
+    touch "$lockfile"
+    if ! grep "$*" "$lockfile" >/dev/null; then
+        eval "$*" | tee >(if ! grep "nstalled" >/dev/null; then
+            printf '%s\n' "$*" >>"$lockfile"
+        fi)
+    fi
+}
+
 # _get_from_github: extract github releases tarballs over .local
 # usage: _get_from_github <dev/app> <filename> <tar_flag> <success_cmd> [installer_cmd]
 #        where VER completes to the version name.
@@ -124,10 +135,14 @@ pygmentize="[[ -f $HOME/.local/bin/pygmentize ]] || pip install --user --force-r
 alias pcat="$pygmentize -f terminal256 -O style=native -g"
 alias pless="LESSOPEN='|($pygmentize -f terminal256 -O style=native -g %s)' less"
 
-eval "$(hub alias -s || echo hub-update)"
+if type -p hub >/dev/null; then
+    eval "$(hub alias -s)"
+else
+    _wrap_update_prompt_once hub-update
+fi
 
 if [[ ! -f $HOME/.local/bin/kitty ]]; then
-    kitty-update
+    _wrap_update_prompt_once kitty-update
 fi
 
 # enable color support of ls and also add handy aliases

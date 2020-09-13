@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# type mate-session >/dev/null 2>&1
+# test "$XDG_CURRENT_DESKTOP" = MATE
 
 echo "Setting up MATE / i3"
 gsettings set org.mate.background show-desktop-icons false

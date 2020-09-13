@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# type gnome-session >/dev/null 2>&1
+# test "$XDG_CURRENT_DESKTOP" = GNOME
 
 echo "Setting up GNOME"
 gsettings set org.gnome.desktop.wm.preferences focus-mode mouse

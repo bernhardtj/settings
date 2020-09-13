@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# type gnome-session >/dev/null 2>&1
+# test "$XDG_CURRENT_DESKTOP" = GNOME
 
 if [[ ! -f "$HOME/.local/share/gnome-shell/extensions/gnomesome@chwick.github.com/extension.js" ]]; then
     mkdir -p "$HOME/.local/share/gnome-shell/extensions/gnomesome@chwick.github.com/"
