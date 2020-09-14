@@ -44,7 +44,7 @@ run_scripts() {
         conditional=$(head -n2 "$script" | tr '\n' '#' | cut -d '#' -f4)
         interpreter=$(head -n2 "$script" | tr '\n' '#' | cut -d '#' -f2 | tr -d '!')
         log 2 "scripts: will execute $(basename "$script" | cut -d '.' -f1) if $conditional"
-        if [[ -n $conditional ]] && bash -c "${conditional//\$/$}"; then
+        if [[ -n $conditional ]] && bash -c "${conditional//\$/$}" >/dev/null 2>/dev/null; then
             log 1 "-> executing $(basename "$script" | cut -d '.' -f2)"
             log 2 "+ $interpreter $script"
             $interpreter "$script" | while read -r line; do
