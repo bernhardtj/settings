@@ -18,12 +18,6 @@ if ! shopt -oq posix; then
     fi
 fi
 
-# history search for command being typed by pressing arrowkeys
-bind '"\e[A": history-search-backward'
-bind '"\e[B": history-search-forward'
-#press alt-h for some help after a command is typed out
-bind '"\eh": "\C-a\eb\ed\C-y\e#man \C-y\C-m\C-p\C-p\C-a\C-d\C-e"'
-
 # the possible locations for this infernal script
 while read -r line; do [[ -f $line ]] && source "$line"; done <<EOF
 /etc/bash_completion.d/git-prompt
@@ -55,6 +49,15 @@ if declare -f __git_ps1 >/dev/null; then
     PROMPT_COMMAND='__git_ps1 "$PROMPT_FMT" " "'
 else
     PS1="$PROMPT_FMT "
+fi
+
+if [[ -o emacs || -o vi ]]; then
+    bind 'TAB:menu-complete'
+    bind 'set show-all-if-ambiguous on'
+    bind 'set completion-ignore-case on'
+    bind '"\e[A": history-search-backward'
+    bind '"\e[B": history-search-forward'
+    bind '"\eh": "\C-a\eb\ed\C-y\e#man \C-y\C-m\C-p\C-p\C-a\C-d\C-e"'
 fi
 
 source "$HOME/.aliases"
