@@ -168,3 +168,20 @@ alias l='ls -CF'
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+see_term_colors() {
+    printf "\e[30m K \e[31m R \e[32m G \e[33m Y \e[0m"
+    printf "\e[34m B \e[35m M \e[36m C \e[37m W \e[0m"
+    echo
+    printf "\e[30;1m K \e[31;1m R \e[32;1m G \e[33;1m Y \e[0m"
+    printf "\e[34;1m B \e[35;1m M \e[36;1m C \e[37;1m W \e[0m"
+    echo
+    printf "\e[40m K \e[41m R \e[42m G \e[43m Y \e[0m"
+    printf "\e[44m B \e[45m M \e[46m C \e[47m W \e[0m"
+    echo
+    printf "\e[40;1m K \e[41;1m R \e[42;1m G \e[43;1m Y \e[0m"
+    printf "\e[44;1m B \e[45;1m M \e[46;1m C \e[47;1m W \e[0m"
+    echo
+    printf "\e[1m BOLD \e[0m\e[4m Underline \e[0m\e[7m Reversed \e[0m"
+    echo
+}
