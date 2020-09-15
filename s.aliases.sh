@@ -185,3 +185,7 @@ see_term_colors() {
     printf "\e[1m BOLD \e[0m\e[4m Underline \e[0m\e[7m Reversed \e[0m"
     echo
 }
+
+settings-provision-remote () {
+    ssh "$@" bash -c 'cd ~ && rm -rf settings && git clone https://github.com/bernhardtj/settings && settings/apply'
+}
