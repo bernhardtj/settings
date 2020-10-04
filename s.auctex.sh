@@ -1,7 +1,10 @@
 # .local/bin/auctex-update
 #!/bin/bash
+set -e
 tmp=$(mktemp -d)
+
 cat <<'EOF' >"$tmp/.emacs"
+(package-initialize)
 (setq inhibit-startup-message t)
 (show-paren-mode 1)
 (when (fboundp 'global-font-lock-mode) (global-font-lock-mode t))
@@ -10,84 +13,97 @@ cat <<'EOF' >"$tmp/.emacs"
 (setq ispell-program-name "hunspell")
 (setq ispell-local-dictionary "en_US")
 (setq ispell-local-dictionary-alist '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(package-initialize)
-(unless package-archive-contents (package-refresh-contents))
-(unless (package-installed-p 'use-package) (package-install 'use-package))
-(require 'use-package)
-(use-package solarized-theme
-  :ensure t
-  :load-path "themes"
-  :init
-  :config
-  (load-theme 'solarized-light t))
-(use-package reformatter :ensure t)
-(reformatter-define LaTeX-format :program "texpretty-silent")
-(use-package auctex
-  :ensure t
-  :defer t
-  :config
-  (setq latex-run-command "latex")
-  (setq preview-gs-command "/usr/bin/gs")
-  (define-key LaTeX-mode-map (kbd "C-M-L") 'LaTeX-format-buffer)
-  (setq LaTeX-indent-level 4)
-  (setq LaTeX-item-indent -4)
-  (setq LaTeX-left-right-indent-level 4)
-  (setq TeX-electric-sub-and-superscript t)
-  (setq TeX-parse-self t)
-  (setq TeX-auto-save t)
-  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-  (require 'tex-mik)
-  (load "preview.el" nil t t))
+(load-theme 'solarized-light t)
+(add-to-list 'load-path "/root/.emacs.d/site-lisp")
+(require 'tex-site)
+(load "preview.el" nil t t)
+(setq TeX-electric-sub-and-superscript t)
+(setq LaTeX-electric-left-right-brace t)
+(setq TeX-parse-self t)
+(setq TeX-auto-save t)
+(setq-default TeX-engine 'luatex)
+(setq-default TeX-command-extra-options "-shell-escape")
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 EOF
 
-cat <<EOF >"$tmp/auctex.desktop"
-[Desktop Entry]
-Name=AUCTeX
-GenericName=TeX Editor
-Comment=Edit TeX
-MimeType=text/x-tex
-Exec=$HOME/.local/bin/auctex %f
-Icon=emacs
-Type=Application
-Terminal=false
-Categories=Utility;TextEditor;X-Red-Hat-Base;
-StartupWMClass=Emacs
-X-Desktop-File-Install-Version=0.24
+cat <<'EOF' >"$tmp/starter.tex"
+\documentclass[12pt]{article}
+\usepackage[left=1in, right=1in, top=1in, bottom=1in]{geometry}
+\usepackage{amsmath, amssymb, bm, cancel, float, fancyhdr, tikz, graphicx}
+\pagestyle{fancy}\renewcommand{\headrulewidth}{0pt}\fancyhf{}
+\rhead{\bf TITLE}\lhead{\bf NAME}\cfoot{\thepage}
+
+\def\checkmark{\hspace{1ex}\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+\let\transpose\intercal
+
+\usepackage{pgfplotstable}\pgfplotsset{compat=1.17}
+
+\usepackage{minted}
+\newcommand\loc[3]{\inputminted[linenos, firstline=#1, lastline=#2]{python}{#3}\noindent}
+\newcommand\textcc[1]{\mintinline{python}{#1}}
+
+\begin{document}
+
+% \begin{thebibliography}{1}
+% \bibitem{bib1} Some entry
+% \end{thebibliography}
+\end{document}
 EOF
 
 cat <<'EOF' >"$tmp/doit"
-f=; test -n "$1" && f="/var/host/$1"
-mkdir -p $HOME/.cache/auctex/emacs $HOME/.cache/auctex/miktex
-podman run --rm -it \
--v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY --security-opt=label=disable \
--v $HOME/.cache/auctex/miktex:/root/.miktex \
--v $HOME/.cache/auctex/emacs:/root/.emacs.d \
--v $HOME/.local/share/fonts:/root/.local/share/fonts \
--v /usr/share/fonts:/usr/share/fonts \
--v /:/var/host auctex /usr/bin/emacs $f
+#!/bin/bash
+case $1 in
+--viewer-proc)
+    func() { cd "$1" && shift && xdg-open "$@"; }
+    while read -r line; do func $line; done
+    ;;
+--new-window)
+    bash "${BASH_SOURCE[0]}"
+    ;;
+--new-document)
+    bash "${BASH_SOURCE[0]}" --eval '(LaTeX-mode)' --insert "$HOME/.cache/auctex/default.tex"
+    ;;
+*)
+    mkdir -p "$HOME/.cache/auctex/work"
+    ln -sf "$HOME/.local/share/auctex/default.tex" "$HOME/.cache/auctex/default.tex"
+    printf '' >"$HOME/.cache/auctex/viewer"
+    tail -f "$HOME/.cache/auctex/viewer" | bash "${BASH_SOURCE[0]}" --viewer-proc &
+    viewerPid=$!
+    trap '[[ "$viewerPid" ]] && kill "$viewerPid"' EXIT
+    podman run --rm -it \
+        -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY --security-opt=label=disable \
+        -v "$HOME/.cache/auctex:/miktex" \
+        -v "$HOME/.local/share/fonts:/root/.local/share/fonts" \
+        -v /var/home:/var/home auctex /usr/bin/emacs "$@"
+    ;;
+esac
 EOF
+
+mkdir -p "$tmp"/hicolor/{scalable,symbolic}/apps
+curl '-#Lo' "$tmp"/hicolor/scalable/apps/auctex.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex.svg
+curl '-#Lo' "$tmp"/hicolor/symbolic/apps/auctex-symbolic.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex-symbolic.svg
+curl '-#L' https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/org.gnome.gnome-latex.desktop.in | sed "s/GNOME LaTeX/AUCTeX/g;s/Icon=.*latex/Icon=auctex/g;s,gnome-latex,$HOME/.local/bin/auctex,g" | tr -d '_' >"$tmp"/auctex.desktop
+curl '-#Lo' "$tmp/auctex.tar.gz" ftp.gnu.org/pub/gnu/auctex/auctex-12.2.tar.gz
 
 podman rmi auctex || true
 rm -rf "$HOME/.cache/auctex"
-install -Dm755 "$tmp/doit" "$HOME/.local/bin/auctex"
-install -Dm664 "$tmp/auctex.desktop" "$HOME/.local/share/applications/auctex.desktop"
 
-podman build -f - -v "$tmp":/mnt --squash-all -t auctex <<EOF
-FROM fedora:32
-RUN echo 'LANG="en_US.UTF-8"' > /etc/locale.conf
-RUN mkdir -p /var/host && mkdir -p /root/.local/share/fonts
-RUN rpm --import "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xD6BC243565B2087BC3F897C9277A7293F59E4889"
-RUN curl -L -o /etc/yum.repos.d/miktex.repo https://miktex.org/download/fedora/32/miktex.repo
-RUN cp /mnt/.emacs /root/.emacs
-RUN dnf install -y adapta-gtk-theme ghostscript miktex emacs evince which python3-pygments make gcc && dnf clean all
-RUN miktexsetup --verbose --shared=yes finish
-RUN initexmf --verbose --admin --set-config-value [MPM]AutoInstall=1
-RUN initexmf --verbose --admin --default-paper-size=letter
-RUN curl ftp://ftp.math.utah.edu/pub/misc/texpretty-0.02.tar.gz | tar xzC .
-RUN cd texpretty-0.02 && ./configure && make && make -i check && make install-exe
-RUN printf '#!/bin/sh\ntexpretty | tail -n+6' > /usr/local/bin/texpretty-silent && chmod 777 /usr/local/bin/texpretty-silent
-RUN rm -rf texpretty*
+podman build -f - -v "$tmp":/mnt --squash-all -t auctex <<'EOF'
+FROM miktex/miktex
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D6BC243565B2087BC3F897C9277A7293F59E4889
+RUN apt update && apt upgrade -y --no-install-recommends emacs25-lucid hunspell python-pygments elpa-solarized-theme && apt autoremove -y && apt clean
+RUN miktexsetup --verbose --shared=yes finish && initexmf --verbose --admin --set-config-value [MPM]AutoInstall=1 && initexmf --verbose --admin --default-paper-size=letter && mpm --verbose --admin --update-db && mpm --verbose --admin --upgrade --package-level=essential && initexmf --verbose --admin --update-fndb
+RUN tar -xzf /mnt/auctex.tar.gz && cd auctex* && ./configure --prefix=/root/.emacs.d/auctex --with-lispdir=/root/.emacs.d/site-lisp --with-texmf-dir=/usr/share/miktex-texmf/miktex && make && make install && cd .. && rm -rf auctex* && rm -rf /miktex/.miktex
+RUN install /mnt/.emacs /root/.emacs && mkdir -p /var/home
+RUN echo 'echo $(pwd) "$@" >> /miktex/viewer' > /usr/bin/evince && chmod +x /usr/bin/evince
 EOF
+
+(
+    cd "$tmp"
+    install -Dvm755 doit "$HOME/.local/bin/auctex"
+    install -Dvm664 auctex.desktop "$HOME/.local/share/applications/auctex.desktop"
+    install -Dvm644 starter.tex "$HOME/.local/share/auctex/default.tex"
+    find hicolor -type f -exec install -Dvm644 {} "$HOME/.local/share/icons"/{} \;
+)
