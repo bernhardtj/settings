@@ -151,17 +151,6 @@ if [[ -z "$MPRINT_PASSWORD" ]]; then
     m_prompt "Password for $MPRINT_USERNAME@$MPRINT_URL" MPRINT_PASSWORD -s && printf '\n'
 fi
 
-if [[ $MPRINT_SAVEFILE ]]; then
-    m_prompt "Save details to $MPRINT_SAVEFILE? [yN]" yesno
-    if [[ "$yesno" =~ [Yy] ]]; then
-        printf '%s@%s\n%s\n' \
-            "$MPRINT_USERNAME" "$MPRINT_URL" \
-            "$(gpg $MPRINT_GPG_OPTIONS --symmetric <<<"$MPRINT_PASSWORD")" >"$MPRINT_SAVEFILE"
-        chmod 600 "$MPRINT_SAVEFILE"
-        m_disp "Saved.\n"
-    fi
-fi
-
 m_disp 'Attempting login [        ]'
 
 JSESSIONID=$(
@@ -211,6 +200,17 @@ UPLOAD=$(
 ) && m_disp '\rAttempting login [===ok===]'
 
 test -z "$UPLOAD" && m_disp '\rAttempting login [==fail==]\nERROR: Invalid username or password.\n' && exit 3
+
+if [[ $MPRINT_SAVEFILE ]]; then
+    m_prompt "Save details to $MPRINT_SAVEFILE? [yN]" yesno
+    if [[ "$yesno" =~ [Yy] ]]; then
+        printf '%s@%s\n%s\n' \
+            "$MPRINT_USERNAME" "$MPRINT_URL" \
+            "$(gpg $MPRINT_GPG_OPTIONS --symmetric <<<"$MPRINT_PASSWORD")" >"$MPRINT_SAVEFILE"
+        chmod 600 "$MPRINT_SAVEFILE"
+        m_disp "Saved.\n"
+    fi
+fi
 
 m_disp '\nUploading file...\n'
 
