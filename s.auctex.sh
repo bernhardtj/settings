@@ -42,7 +42,8 @@ cat <<'EOF' >"$tmp/starter.tex"
 
 \usepackage{minted}
 \newcommand\loc[3]{\inputminted[linenos, firstline=#1, lastline=#2]{python}{#3}\noindent}
-\newcommand\textcc[1]{\mintinline{python}{#1}}
+\def\textpy{\mintinline{python}}
+\def\minterrorsoff{\renewcommand\fcolorbox[4][]{#4}}
 
 \begin{document}
 
@@ -76,7 +77,7 @@ case $1 in
         -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY --security-opt=label=disable \
         -v "$HOME/.cache/auctex:/miktex" \
         -v "$HOME/.local/share/fonts:/root/.local/share/fonts" \
-        -v /var/home:/var/home auctex /usr/bin/emacs "$@"
+        -v /var/home:/var/home auctex "cd $(pwd) || true; /usr/bin/emacs "$@""
     ;;
 esac
 EOF
