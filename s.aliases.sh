@@ -189,3 +189,18 @@ see_term_colors() {
 settings-provision-remote () {
     ssh "$@" bash -c 'cd ~ && rm -rf settings && git clone https://github.com/bernhardtj/settings && settings/apply'
 }
+
+install_stm32cubemx_zipfile () {
+    if [[ $1 ]]; then
+        rm -rf $HOME/STM32Cube
+        installer="$(realpath $1)"
+        pushd $(mktemp -d)
+        unzip $installer
+        JAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" ./*.linux
+        mv $HOME/STM32Cube/STM32CubeMX $HOME/STM32Cube/STM32CubeMXelf
+        printf '#!/bin/bash\nJAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" ${BASH_SOURCE[0]}elf' >$HOME/STM32Cube/STM32CubeMX
+        chmod +x $HOME/STM32Cube/STM32CubeMX
+        popd
+    fi
+}
+
