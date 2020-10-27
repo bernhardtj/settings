@@ -204,3 +204,5 @@ install_stm32cubemx_zipfile () {
     fi
 }
 
+alias ffmpeg='flatpak run --command=ffmpeg --filesystem=home org.videolan.VLC'
+
