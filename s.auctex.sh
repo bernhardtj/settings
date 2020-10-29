@@ -57,7 +57,7 @@ cat <<'EOF' >"$tmp/doit"
 #!/bin/bash
 case $1 in
 --viewer-proc)
-    func() { cd "$1" && shift && xdg-open "$@"; }
+    func() { cd "$1" && shift && xdg-open "$@" >/dev/null 2>/dev/null; }
     while read -r line; do func $line; done
     ;;
 --new-window)
@@ -77,7 +77,7 @@ case $1 in
         -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY --security-opt=label=disable \
         -v "$HOME/.cache/auctex:/miktex" \
         -v "$HOME/.local/share/fonts:/root/.local/share/fonts" \
-        -v /var/home:/var/home auctex "cd $(pwd) || true; /usr/bin/emacs "$@""
+        -v /var/home:/var/home -w "$(pwd)" auctex /usr/bin/emacs "$@"
     ;;
 esac
 EOF
