@@ -30,6 +30,7 @@ cat <<'EOF' >"$tmp/starter.tex"
 \documentclass[12pt]{article}
 \usepackage[left=1in, right=1in, top=1in, bottom=1in]{geometry}
 \usepackage{amsmath, amssymb, bm, cancel, float, fancyhdr, tikz, graphicx}
+\usepackage[charter]{mathdesign}
 \pagestyle{fancy}\renewcommand{\headrulewidth}{0pt}\fancyhf{}
 \rhead{\bf TITLE}\lhead{\bf NAME}\cfoot{\thepage}
 
@@ -38,12 +39,12 @@ cat <<'EOF' >"$tmp/starter.tex"
 \DeclareMathOperator*{\argmax}{argmax}
 \let\transpose\intercal
 
-\usepackage{pgfplotstable}\pgfplotsset{compat=1.17}
+% \usepackage{pgfplotstable}\pgfplotsset{compat=1.17}
 
-\usepackage{minted}
-\newcommand\loc[3]{\inputminted[linenos, firstline=#1, lastline=#2]{python}{#3}\noindent}
-\def\textpy{\mintinline{python}}
-\def\minterrorsoff{\renewcommand\fcolorbox[4][]{#4}}
+% \usepackage{minted}
+% \newcommand\loc[3]{\inputminted[linenos, firstline=#1, lastline=#2]{python}{#3}\noindent}
+% \def\textpy{\mintinline{python}}
+% \def\minterrorsoff{\renewcommand\fcolorbox[4][]{#4}}
 
 \begin{document}
 
