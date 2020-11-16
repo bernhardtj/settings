@@ -1,0 +1,9 @@
+.local/share/gnome-shell/extensions/settings@localhost/stylesheet.css
+
+#panel {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#panel .panel-corner {
+    -panel-corner-background-color: rgba(0, 0, 0, 0);
+}
