@@ -206,3 +206,15 @@ install_stm32cubemx_zipfile () {
 
 alias ffmpeg='flatpak run --command=ffmpeg --filesystem=home org.videolan.VLC'
 
+backgrounds-update () {
+mkdir -p $HOME/{.local/share/,.cache/gnome-control-center/}backgrounds
+podman run --rm -it -v $HOME/.local/share/backgrounds:/mnt --security-opt=label=disable fedora bash <<'EOF'
+set -e
+dnf install -y *backgrounds* findutils
+find /usr/share/backgrounds -type f -exec sh -c \
+'install -Dvm644 {} /mnt/$(md5sum {} | cut -d \  -f1)_$(basename {})' \;
+rm -f /mnt/*.xml
+exit
+EOF
+}
+
