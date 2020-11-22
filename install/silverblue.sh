@@ -6,6 +6,7 @@ echo 'settings/apply -v && exit' >"$HOME/.zshrc"
 
 pkexec bash <<EOF
 rpm-ostree cancel &&
+rpm-ostree reset &&
 rpm-ostree update &&
 rpm-ostree override remove sudo &&
 rpm-ostree install zsh ImageMagick &&
