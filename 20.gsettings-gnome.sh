@@ -8,4 +8,5 @@ gsettings set org.gnome.desktop.wm.preferences auto-raise-delay 0
 gsettings set org.gnome.desktop.interface monospace-font-name "Fira Code 12"
 gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
 gsettings set org.gnome.desktop.peripherals.trackball scroll-wheel-emulation-button 2
+gsettings set org.gnome.desktop.input-sources xkb-options "['caps:ctrl_modifier']"
 
