@@ -195,10 +195,24 @@ install_stm32cubemx_zipfile () {
         rm -rf $HOME/STM32Cube
         installer="$(realpath $1)"
         pushd $(mktemp -d)
+        cat <<EOF > auto-install.xml
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<AutomatedInstallation langpack="eng">
+    <com.st.microxplorer.install.MXHTMLHelloPanel id="readme"/>
+    <com.st.microxplorer.install.MXLicensePanel id="licence.panel"/>
+    <com.st.microxplorer.install.MXAnalyticsPanel id="analytics.panel"/>
+    <com.st.microxplorer.install.MXTargetPanel id="target.panel">
+        <installpath>$HOME/STM32Cube</installpath>
+    </com.st.microxplorer.install.MXTargetPanel>
+    <com.st.microxplorer.install.MXShortcutPanel id="shortcut.panel"/>
+    <com.st.microxplorer.install.MXInstallPanel id="install.panel"/>
+    <com.st.microxplorer.install.MXFinishPanel id="finish.panel"/>
+</AutomatedInstallation>
+EOF
         unzip $installer
-        JAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" ./*.linux
+        JAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" ./*.linux auto-install.xml
         mv $HOME/STM32Cube/STM32CubeMX $HOME/STM32Cube/STM32CubeMXelf
-        printf '#!/bin/bash\nJAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" ${BASH_SOURCE[0]}elf' >$HOME/STM32Cube/STM32CubeMX
+        printf '#!/bin/bash\nJAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" "${BASH_SOURCE[0]}elf" "$@"' >$HOME/STM32Cube/STM32CubeMX
         chmod +x $HOME/STM32Cube/STM32CubeMX
         popd
     fi
