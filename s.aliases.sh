@@ -6,74 +6,10 @@ if ! [[ "$PATH" =~ $HOME/.local/bin:$HOME/bin: ]]; then
 fi
 export PATH
 
-_wrap_update_prompt_once() {
-    local lockfile="$HOME/.cache/aliases/updater-blacklist"
-    mkdir -p "$(dirname "$lockfile")"
-    touch "$lockfile"
-    if ! grep "$*" "$lockfile" >/dev/null; then
-        eval "$*" | tee >(if ! grep "nstalled" >/dev/null; then
-            printf '%s\n' "$*" >>"$lockfile"
-        fi)
-    fi
-}
-
-# _get_from_github: extract github releases tarballs over .local
-# usage: _get_from_github <dev/app> <filename> <tar_flag> <success_cmd> [installer_cmd]
-#        where VER completes to the version name.
-# if installer_cmd is specified, it is eval'd with the tarball root as pwd.
-_get_from_github() {
-    URL="https://github.com/$1/releases"
-    VERSION=$(curl -s "$URL/latest" | sed 's/.*tag\/\(.*\)".*/\1/g')
-    printf "Install %s release %s? [yN] " "$1" "$VERSION" && read -r yesno
-    if [[ "$yesno" =~ [Yy] ]]; then
-        if [[ $5 ]]; then
-            dest=$(mktemp -d)
-            installer_cmd=${5//VER/${VERSION//v/}}
-        else
-            dest=$HOME/.local
-            installer_cmd=
-        fi
-        set -e
-        curl '-#L' "$URL/download/$VERSION/${2//VER/${VERSION//v/}}" | tar "x$3C" "$dest"
-        bash -c "cd '$dest' && eval '$installer_cmd'"
-        printf "Installed %s!\n" "$(eval "$4")"
-    fi
-}
-
-alias kitty-update="_get_from_github kovidgoyal/kitty kitty-VER-x86_64.txz J 'kitty --version'"
-alias pandoc-update="_get_from_github jgm/pandoc pandoc-VER-linux-amd64.tar.gz z 'pandoc --version'"
-alias hub-update="_get_from_github github/hub hub-linux-amd64-VER.tgz z 'hub --version | tail -n1' 'prefix=$HOME/.local ./hub-linux-amd64-VER/install'"
-alias gh-update="_get_from_github cli/cli gh_VER_linux_amd64.tar.gz z 'gh --version | head -n1' 'cp -r gh_VER_linux_amd64/{bin,share} $HOME/.local'"
-
-arm-none-eabi-update() {
-    URL=https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
-    LINK="$(curl -s $URL | grep -m 1 '64-bit.*Linux' | cut -d '"' -f2 | cut -d '?' -f1)"
-    printf "Install %s? [yN] " "$(basename "${LINK/\.tar.*//}")" && read -r yesno
-    if [[ "$yesno" =~ [Yy] ]]; then
-        curl '-#L' "https://developer.arm.com$LINK" | tar xjC "$HOME/.local" --strip 1
-        cat <<'EOF'
-GCC is installed! Remember to do this to your CMakeLists_template.txt:
-sed -i s,\ arm-none-eabi,\ $HOME/.local/bin/arm-none-eabi,g CMakeLists_template.txt
-EOF
-    fi
-}
-
-jetbrains-toolbox-update() {
-    URL='https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release'
-    prefix=$(mktemp -d)
-    eval "$(
-        python <<EOF
-import json
-resp = json.loads(r"""$(curl -s "$URL")""")['TBA'][0]
-print(f"printf 'Install jetbrains-toolbox {resp['type']} {resp['date']}? [Y] '; read;")
-print(f"curl '-#L' {resp['downloads']['linux']['link']} | tar xzC $prefix --strip 1;")
-print("$prefix/jetbrains-toolbox;")
-EOF
-    )"
-}
-
 sudo () {
-    if [[ $TERM == linux ]]; then
+    if [[ $TOOLBOX_PATH ]]; then
+        /bin/sudo "$@"
+    elif [[ $TERM == linux ]]; then
         pkttyagent -p $$ | pkexec sh -c "cd $(pwd) && $*; killall pkttyagent"
     else
         pkexec sh -c "cd $(pwd) && $*"
@@ -131,20 +67,6 @@ alias slack-dl='curl -L -H "Authorization: Bearer $(cat $HOME/.config/slack-cli/
 
 alias flathub-update='flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo'
 
-pygmentize="[[ -f $HOME/.local/bin/pygmentize ]] || pip install --user --force-reinstall pygments >/dev/null && $HOME/.local/bin/pygmentize"
-alias pcat="$pygmentize -f terminal256 -O style=native -g"
-alias pless="LESSOPEN='|($pygmentize -f terminal256 -O style=native -g %s)' less"
-
-if type -p hub >/dev/null; then
-    eval "$(hub alias -s)"
-else
-    _wrap_update_prompt_once hub-update
-fi
-
-if [[ ! -f $HOME/.local/bin/kitty ]]; then
-    _wrap_update_prompt_once kitty-update
-fi
-
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -188,34 +110,6 @@ see_term_colors() {
 
 settings-provision-remote () {
     ssh "$@" bash -c 'cd ~ && rm -rf settings && git clone https://github.com/bernhardtj/settings && settings/apply'
-}
-
-install_stm32cubemx_zipfile () {
-    if [[ $1 ]]; then
-        rm -rf $HOME/STM32Cube
-        installer="$(realpath $1)"
-        pushd $(mktemp -d)
-        cat <<EOF > auto-install.xml
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<AutomatedInstallation langpack="eng">
-    <com.st.microxplorer.install.MXHTMLHelloPanel id="readme"/>
-    <com.st.microxplorer.install.MXLicensePanel id="licence.panel"/>
-    <com.st.microxplorer.install.MXAnalyticsPanel id="analytics.panel"/>
-    <com.st.microxplorer.install.MXTargetPanel id="target.panel">
-        <installpath>$HOME/STM32Cube</installpath>
-    </com.st.microxplorer.install.MXTargetPanel>
-    <com.st.microxplorer.install.MXShortcutPanel id="shortcut.panel"/>
-    <com.st.microxplorer.install.MXInstallPanel id="install.panel"/>
-    <com.st.microxplorer.install.MXFinishPanel id="finish.panel"/>
-</AutomatedInstallation>
-EOF
-        unzip $installer
-        JAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" ./*.linux auto-install.xml
-        mv $HOME/STM32Cube/STM32CubeMX $HOME/STM32Cube/STM32CubeMXelf
-        printf '#!/bin/bash\nJAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" "${BASH_SOURCE[0]}elf" "$@"' >$HOME/STM32Cube/STM32CubeMX
-        chmod +x $HOME/STM32Cube/STM32CubeMX
-        popd
-    fi
 }
 
 alias ffmpeg='flatpak run --command=ffmpeg --filesystem=home org.videolan.VLC'
