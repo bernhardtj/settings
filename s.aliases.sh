@@ -16,14 +16,6 @@ sudo () {
     fi
 }
 
-rpm-ostree-auto-updates() {
-    sudo bash <<EOF
-set -x
-sed s/^#A/A/g\;s/none/stage/g /usr/etc/rpm-ostreed.conf >/etc/rpm-ostreed.conf
-systemctl enable rpm-ostreed-automatic.timer
-EOF
-}
-
 copr-enable() {
     release_ver=$(rpm -E %fedora)
     sudo bash -c "cd /etc/yum.repos.d && curl -LO https://copr.fedorainfracloud.org/coprs/$1/repo/fedora-$release_ver/${1//\//\-}-fedora-$release_ver.repo"
@@ -64,8 +56,6 @@ alias quote="sed -i 's/^/\>/g'"
 alias proc='ps a -u $(whoami)'
 
 alias slack-dl='curl -L -H "Authorization: Bearer $(cat $HOME/.config/slack-cli/slack_token)"'
-
-alias flathub-update='flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo'
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
