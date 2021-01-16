@@ -17,9 +17,9 @@ EOF
 
 rm -rf ~/.local/share/gnome-shell/extensions/settings@localhost
 XDG_DATA_DIRS='' gnome-extensions create \
---name='Settings for GNOME' \
---description='GNOME Shell javascript tweaks, per Settings' \
---uuid="settings@localhost" \
-2> /dev/null
+    --name='Settings for GNOME' \
+    --description='GNOME Shell javascript tweaks, per Settings' \
+    --uuid="settings@localhost" \
+    2>/dev/null
 
 gsettings set org.gnome.shell enabled-extensions "['gnomesome@chwick.github.com', 'places-menu@gnome-shell-extensions.gcampax.github.com', 'settings@localhost']"
