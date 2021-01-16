@@ -109,7 +109,7 @@ while [[ $# -gt 0 ]]; do
             eval "$_flag_store_to=$1"
             _flag_store_to=
         else
-            if [[ -z "$MPRINT_FILENAME" ]]; then
+            if [[ -z $MPRINT_FILENAME ]]; then
                 MPRINT_FILENAME=$1
             else
                 usage 1
@@ -124,7 +124,7 @@ if [[ $_flag_store_to ]]; then
     usage 1
 fi
 
-if [[ -z "$MPRINT_FILENAME" ]]; then
+if [[ -z $MPRINT_FILENAME ]]; then
     usage 1
 fi
 
@@ -140,14 +140,14 @@ if [[ $MPRINT_SAVEFILE && -f $MPRINT_SAVEFILE ]]; then
     MPRINT_SAVEFILE=
 fi
 
-if [[ -z "$MPRINT_URL" ]]; then
+if [[ -z $MPRINT_URL ]]; then
     m_prompt 'Server URL' MPRINT_URL
 fi
-if [[ -z "$MPRINT_USERNAME" ]]; then
+if [[ -z $MPRINT_USERNAME ]]; then
     m_disp "=== Authenticating to $MPRINT_URL ===\n"
     m_prompt 'User' MPRINT_USERNAME
 fi
-if [[ -z "$MPRINT_PASSWORD" ]]; then
+if [[ -z $MPRINT_PASSWORD ]]; then
     m_prompt "Password for $MPRINT_USERNAME@$MPRINT_URL" MPRINT_PASSWORD -s && printf '\n'
 fi
 
@@ -203,7 +203,7 @@ test -z "$UPLOAD" && m_disp '\rAttempting login [==fail==]\nERROR: Invalid usern
 
 if [[ $MPRINT_SAVEFILE ]]; then
     m_prompt "Save details to $MPRINT_SAVEFILE? [yN]" yesno
-    if [[ "$yesno" =~ [Yy] ]]; then
+    if [[ $yesno =~ [Yy] ]]; then
         printf '%s@%s\n%s\n' \
             "$MPRINT_USERNAME" "$MPRINT_URL" \
             "$(gpg $MPRINT_GPG_OPTIONS --symmetric <<<"$MPRINT_PASSWORD")" >"$MPRINT_SAVEFILE"

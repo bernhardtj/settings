@@ -32,7 +32,7 @@ GIT_PS1_SHOWUPSTREAM='auto'
 GIT_PS1_STATESEPARATOR=''
 GIT_PS1_DESCRIBE_STYLE='default'
 
-if [[ "$TERM" == *color* ]]; then
+if [[ $TERM == *color* ]]; then
     GIT_PS1_SHOWCOLORHINTS=1
     _c_code() {
         printf '\033[%sm' "$(printf ';%s' "$@")"
