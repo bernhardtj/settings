@@ -116,3 +116,6 @@ exit
 EOF
 }
 
+# Wrap git automatically by adding the following to ~/.zshrc:
+
+eval "$(hub alias -s)"
