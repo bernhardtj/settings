@@ -1,9 +1,11 @@
-# .local/bin/auctex-update
-#!/bin/bash
-set -e
-tmp=$(mktemp -d)
+recipe_bin() {
+    echo auctex
+}
+recipe_install() {
+    set -e
+    tmp=$(mktemp -d)
 
-cat <<'EOF' >"$tmp/.emacs"
+    cat <<'EOF' >"$tmp/.emacs"
 (package-initialize)
 (setq inhibit-startup-message t)
 (show-paren-mode 1)
@@ -26,7 +28,7 @@ cat <<'EOF' >"$tmp/.emacs"
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 EOF
 
-cat <<'EOF' >"$tmp/starter.tex"
+    cat <<'EOF' >"$tmp/starter.tex"
 \documentclass[12pt]{article}
 \usepackage[left=1in, right=1in, top=1in, bottom=1in]{geometry}
 \usepackage{amsmath, amssymb, bm, cancel, float, fancyhdr, tikz, graphicx}
@@ -54,7 +56,7 @@ cat <<'EOF' >"$tmp/starter.tex"
 \end{document}
 EOF
 
-cat <<'EOF' >"$tmp/doit"
+    cat <<'EOF' >"$tmp/doit"
 #!/bin/bash
 case $1 in
 --viewer-proc)
@@ -83,16 +85,16 @@ case $1 in
 esac
 EOF
 
-mkdir -p "$tmp"/hicolor/{scalable,symbolic}/apps
-curl '-#Lo' "$tmp"/hicolor/scalable/apps/auctex.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex.svg
-curl '-#Lo' "$tmp"/hicolor/symbolic/apps/auctex-symbolic.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex-symbolic.svg
-curl '-#L' https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/org.gnome.gnome-latex.desktop.in | sed "s/GNOME LaTeX/AUCTeX/g;s/Icon=.*latex/Icon=auctex/g;s,gnome-latex,$HOME/.local/bin/auctex,g" | tr -d '_' >"$tmp"/auctex.desktop
-curl '-#Lo' "$tmp/auctex.tar.gz" ftp.gnu.org/pub/gnu/auctex/auctex-12.2.tar.gz
+    mkdir -p "$tmp"/hicolor/{scalable,symbolic}/apps
+    curl '-#Lo' "$tmp"/hicolor/scalable/apps/auctex.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex.svg
+    curl '-#Lo' "$tmp"/hicolor/symbolic/apps/auctex-symbolic.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex-symbolic.svg
+    curl '-#L' https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/org.gnome.gnome-latex.desktop.in | sed "s/GNOME LaTeX/AUCTeX/g;s/Icon=.*latex/Icon=auctex/g;s,gnome-latex,$HOME/.local/bin/auctex,g" | tr -d '_' >"$tmp"/auctex.desktop
+    curl '-#Lo' "$tmp/auctex.tar.gz" ftp.gnu.org/pub/gnu/auctex/auctex-12.2.tar.gz
 
-podman rmi auctex || true
-rm -rf "$HOME/.cache/auctex"
+    podman rmi auctex || true
+    rm -rf "$HOME/.cache/auctex"
 
-podman build -f - -v "$tmp":/mnt --squash-all -t auctex <<'EOF'
+    podman build -f - -v "$tmp":/mnt --squash-all -t auctex <<'EOF'
 FROM miktex/miktex
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D6BC243565B2087BC3F897C9277A7293F59E4889
 RUN apt update && apt upgrade -y --no-install-recommends emacs25-lucid hunspell python-pygments elpa-solarized-theme && apt autoremove -y && apt clean
@@ -102,10 +104,10 @@ RUN install /mnt/.emacs /root/.emacs && mkdir -p /var/home
 RUN echo 'echo $(pwd) "$@" >> /miktex/viewer' > /usr/bin/evince && chmod +x /usr/bin/evince
 EOF
 
-(
     cd "$tmp"
     install -Dvm755 doit "$HOME/.local/bin/auctex"
     install -Dvm664 auctex.desktop "$HOME/.local/share/applications/auctex.desktop"
     install -Dvm644 starter.tex "$HOME/.local/share/auctex/default.tex"
     find hicolor -type f -exec install -Dvm644 {} "$HOME/.local/share/icons"/{} \;
-)
+
+}
