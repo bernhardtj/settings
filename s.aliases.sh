@@ -119,3 +119,8 @@ EOF
 # Wrap git automatically by adding the following to ~/.zshrc:
 
 eval "$(hub alias -s)"
+
+rpm-ostree-groupinstall () {
+rpm-ostree install $(dnf groupinfo $1 | sed -n '/Optional/q; /  /p')
+}
+
