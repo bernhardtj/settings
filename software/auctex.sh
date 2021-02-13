@@ -1,11 +1,27 @@
 recipe_bin() {
     echo auctex
 }
-recipe_install() {
-    set -e
-    tmp=$(mktemp -d)
+recipe_visual_bin() {
+    echo auctex.desktop
+}
 
-    cat <<'EOF' >"$tmp/.emacs"
+recipe_visual_begin() {
+    mkdir -p hicolor/{scalable,symbolic}/apps
+    curl '-sLo' hicolor/scalable/apps/auctex.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex.svg
+    curl '-sLo' hicolor/symbolic/apps/auctex-symbolic.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex-symbolic.svg
+    curl '-sL' https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/org.gnome.gnome-latex.desktop.in | sed "s/GNOME LaTeX/AUCTeX/g;s/Icon=.*latex/Icon=auctex/g;s,gnome-latex,$HOME/.local/bin/auctex recipevisual,g" | tr -d '_' >auctex.desktop
+    install -Dvm664 auctex.desktop "$HOME/.local/share/applications/auctex.desktop"
+    find hicolor -type f -exec install -Dvm644 {} "$HOME/.local/share/icons"/{} \;
+}
+
+recipe_visual_end() {
+    sed -i 's/ recipevisual//g' "$HOME/.local/share/applications/auctex.desktop"
+}
+
+recipe_install() {
+    _software_visual begin
+
+    cat <<'EOF' >".emacs"
 (package-initialize)
 (setq inhibit-startup-message t)
 (show-paren-mode 1)
@@ -28,11 +44,10 @@ recipe_install() {
 (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 EOF
 
-    cat <<'EOF' >"$tmp/starter.tex"
+    cat <<'EOF' >"starter.tex"
 \documentclass[12pt]{article}
 \usepackage[left=1in, right=1in, top=1in, bottom=1in]{geometry}
 \usepackage{amsmath, amssymb, bm, cancel, float, fancyhdr, tikz, graphicx}
-\usepackage[charter]{mathdesign}
 \pagestyle{fancy}\renewcommand{\headrulewidth}{0pt}\fancyhf{}
 \rhead{\bf TITLE}\lhead{\bf NAME}\cfoot{\thepage}
 
@@ -56,7 +71,7 @@ EOF
 \end{document}
 EOF
 
-    cat <<'EOF' >"$tmp/doit"
+    cat <<'EOF' >"doit"
 #!/bin/bash
 case $1 in
 --viewer-proc)
@@ -85,16 +100,14 @@ case $1 in
 esac
 EOF
 
-    mkdir -p "$tmp"/hicolor/{scalable,symbolic}/apps
-    curl '-#Lo' "$tmp"/hicolor/scalable/apps/auctex.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex.svg
-    curl '-#Lo' "$tmp"/hicolor/symbolic/apps/auctex-symbolic.svg https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/icons/org.gnome.gnome-latex-symbolic.svg
-    curl '-#L' https://gitlab.gnome.org/GNOME/gnome-latex/-/raw/master/data/org.gnome.gnome-latex.desktop.in | sed "s/GNOME LaTeX/AUCTeX/g;s/Icon=.*latex/Icon=auctex/g;s,gnome-latex,$HOME/.local/bin/auctex,g" | tr -d '_' >"$tmp"/auctex.desktop
-    curl '-#Lo' "$tmp/auctex.tar.gz" ftp.gnu.org/pub/gnu/auctex/auctex-12.2.tar.gz
+    curl '-#Lo' "auctex.tar.gz" ftp.gnu.org/pub/gnu/auctex/auctex-12.2.tar.gz
 
     podman rmi auctex || true
     rm -rf "$HOME/.cache/auctex"
+    install -Dvm644 starter.tex "$HOME/.local/share/auctex/default.tex"
 
-    podman build -f - -v "$tmp":/mnt --squash-all -t auctex <<'EOF'
+    (
+        podman build -f - -v "$(pwd):/mnt" --squash-all -t auctex <<'EOF'
 FROM miktex/miktex
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D6BC243565B2087BC3F897C9277A7293F59E4889
 RUN apt update && apt upgrade -y --no-install-recommends emacs25-lucid hunspell python-pygments elpa-solarized-theme && apt autoremove -y && apt clean
@@ -103,11 +116,16 @@ RUN tar -xzf /mnt/auctex.tar.gz && cd auctex* && ./configure --prefix=/root/.ema
 RUN install /mnt/.emacs /root/.emacs && mkdir -p /var/home
 RUN echo 'echo $(pwd) "$@" >> /miktex/viewer' > /usr/bin/evince && chmod +x /usr/bin/evince
 EOF
+    ) && install -Dvm755 doit "$HOME/.local/bin/auctex"
 
-    cd "$tmp"
-    install -Dvm755 doit "$HOME/.local/bin/auctex"
-    install -Dvm664 auctex.desktop "$HOME/.local/share/applications/auctex.desktop"
-    install -Dvm644 starter.tex "$HOME/.local/share/auctex/default.tex"
-    find hicolor -type f -exec install -Dvm644 {} "$HOME/.local/share/icons"/{} \;
+    _software_visual end
+}
 
+recipe_visual_install() {
+    local i=0
+    recipe_install | while read line; do
+        echo $line >&2
+        echo $((i / 30))
+        i=$((i + 1))
+    done | zenity --progress --auto-kill --auto-close --time-remaining --text 'Provisioning AUCTeX.'
 }
