@@ -57,6 +57,8 @@ alias proc='ps a -u $(whoami)'
 
 alias slack-dl='curl -L -H "Authorization: Bearer $(cat $HOME/.config/slack-cli/slack_token)"'
 
+alias git=hub
+
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -115,10 +117,6 @@ rm -f /mnt/*.xml
 exit
 EOF
 }
-
-# Wrap git automatically by adding the following to ~/.zshrc:
-
-eval "$(hub alias -s)"
 
 rpm-ostree-groupinstall () {
 rpm-ostree install $(dnf groupinfo $1 | sed -n '/Optional/q; /  /p')

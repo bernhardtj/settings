@@ -5,7 +5,6 @@ recipe_bin() {
 recipe_install() {
     URL="https://github.com/turbovnc/turbovnc/releases"
     VERSION=$(curl -s "$URL/latest" | sed 's/.*tag\/\(.*\)".*/\1/g')
-    cd $(mktemp -d)
     curl '-#L' "https://sourceforge.net/projects/turbovnc/files/$VERSION/turbovnc-$VERSION.x86_64.rpm" | rpm2cpio | cpio -id
     rm -rf ~/.local/share/TurboVNC
     mv opt/TurboVNC ~/.local/share

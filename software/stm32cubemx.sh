@@ -5,7 +5,6 @@ recipe_bin() {
 }
 
 recipe_install() {
-    cd $(mktemp -d)
     curl '-#LO' $PERMALINK
     cat <<EOF >auto-install.xml
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
