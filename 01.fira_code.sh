@@ -2,6 +2,8 @@
 # test -n "$DISPLAY"
 # see https://github.com/tonsky/FiraCode/wiki/Linux-instructions
 
+unset FCCACHE
+
 fonts_dir="${HOME}/.local/share/fonts"
 if [ ! -d "${fonts_dir}" ]; then
     echo "mkdir -p $fonts_dir"
@@ -16,6 +18,7 @@ for type in Bold Light Medium Regular Retina; do
     if [ ! -e "${file_path}" ]; then
         echo "wget -O $file_path $file_url"
         curl -sLo "${file_path}" "${file_url}"
+        FCCACHE=t
     else
         echo "Found existing file $file_path"
     fi
@@ -26,9 +29,12 @@ file_url="https://github.com/tonsky/FiraCode/files/412440/FiraCode-Regular-Symbo
 if [ ! -e "${file_path}" ]; then
     echo "wget -O $file_path $file_url"
     curl -sL "${file_url}" | gunzip - >"${file_path}"
+    FCCACHE=t
 else
     echo "Found existing file $file_path"
 fi
 
-echo "fc-cache -f"
-fc-cache -f
+if [[ $FCCACHE ]]; then
+    echo "fc-cache -f"
+    fc-cache -f
+fi

@@ -1,4 +1,6 @@
-.local/share/gnome-shell/extensions/settings@localhost/stylesheet.css
+/* .local/share/gnome-shell/extensions/settings@localhost/stylesheet.css
+ * overrides styling in https://gitlab.gnome.org/GNOME/gnome-shell/data/theme/gnome-shell.scss
+ */
 
 #panel {
     background-color: rgba(0, 0, 0, 0);
