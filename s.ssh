@@ -1,5 +1,10 @@
 # .ssh/config
 
+Host octopux2
+    User octopux
+    KexAlgorithms diffie-hellman-group1-sha1
+    Ciphers aes128-cbc
+
 Host *discovery*
     User bernhardt.j
 
