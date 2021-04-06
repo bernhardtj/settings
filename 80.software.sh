@@ -17,7 +17,7 @@ _get_from_github() {
         installer_cmd=
     fi
     set -e
-    curl '-#L' "$URL/download/$VERSION/${2//VER/${VERSION//v/}}" | tar "x$3C" "$dest"
+    curl '-#L' "$URL/download/$VERSION/${2//VER/${VERSION//v/}}" | tar -x -$3 -C "$dest"
     bash -c "cd '$dest' && eval '$installer_cmd'"
     printf "Installed %s!\n" "$(eval "$4")" >&2
 }

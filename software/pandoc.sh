@@ -3,5 +3,5 @@ recipe_bin() {
 }
 
 recipe_install() {
-    _get_from_github jgm/pandoc pandoc-VER-linux-amd64.tar.gz z 'pandoc --version'
+    _get_from_github jgm/pandoc pandoc-VER-linux-amd64.tar.gz 'z --strip 1' 'pandoc --version | head -n1'
 }
