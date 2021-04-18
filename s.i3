@@ -26,7 +26,7 @@ bindsym $mod+Shift+k move up
 bindsym $mod+Shift+l move right
 
 bindsym $mod+Prior workspace prev
-bindsym $mod+Next exec bash -c "i3-msg workspace \$((`i3-msg -t get_workspaces | jq -r '.[] | select(.focused==true).name'`+1))"
+bindsym $mod+Next workspace next
 
 bindsym $mod+i split h
 bindsym $mod+o split v
@@ -103,3 +103,6 @@ for_window [title="(?i)authy"] floating enable
 for_window [title="(?i)Starting Unity"] floating enable
 for_window [title="Buddy List"] floating enable
 for_window [title="Husky Mail - Sylpheed(?i)"] move scratchpad
+
+exec python $HOME/.gestures &
+
