@@ -1,0 +1,19 @@
+# .config/auctex/indentconfig.yaml
+paths:
+  - /root/indentconfig.yaml
+defaultIndent: '  '
+modifyLineBreaks:
+    preserveBlankLines: 0
+    oneSentencePerLine:
+        manipulateSentences: 1     
+        removeSentenceLineBreaks: 1
+        textWrapSentences: 1
+        sentenceIndent: '  '
+    textWrapOptions:
+        columns: 80
+    environments:
+        BeginStartsOnOwnLine: 1
+        BodyStartsOnOwnLine: 1
+        EndStartsOnOwnLine: 1
+        EndFinishesWithLineBreak: 1
+

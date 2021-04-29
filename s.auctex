@@ -1,0 +1,18 @@
+;; .config/auctex/.emacs
+(setq inhibit-startup-message t)
+(show-paren-mode 1)
+(set-frame-font "Fira Code 12" nil t)
+(setq initial-major-mode 'LaTeX-mode)
+(setq initial-scratch-message
+  (with-temp-buffer (insert-file-contents "~/template.tex") (buffer-string)))
+(setq TeX-electric-sub-and-superscript t)
+(setq LaTeX-electric-left-right-brace t)
+(setq TeX-parse-self t)
+(setq TeX-auto-save t)
+(setq-default TeX-command-extra-options "-shell-escape")
+(add-hook 'LaTeX-mode-hook (lambda ()
+(LaTeX-math-mode)
+(define-key LaTeX-mode-map (kbd "C-c C-n") (lambda () (interactive)
+  (setq p (line-number-at-pos))
+  (shell-command-on-region (point-min) (point-max) "latexindent -m -rv" nil t)
+  (goto-line p)))))
