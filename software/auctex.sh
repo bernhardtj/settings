@@ -5,12 +5,27 @@ recipe_bin() {
 recipe_install() {
     podman build -t auctex -f - <<EOF
 from texlive/texlive:latest-with-cache
-run apt update && apt install -y libunicode-linebreak-perl libyaml-tiny-perl libfile-homedir-perl auctex emacs-lucid hunspell && apt-get autoremove -qy --purge && rm -rf /var/lib/apt/lists/* && apt-get clean && rm -rf /var/cache/apt/
+run apt update && apt install -y \
+auctex \
+elpa-solarized-theme \
+emacs-lucid \
+hunspell \
+libfile-homedir-perl \
+libunicode-linebreak-perl \
+libyaml-tiny-perl \
+&& apt-get autoremove -qy --purge && rm -rf /var/lib/apt/lists/* && apt-get clean && rm -rf /var/cache/apt/
 EOF
     cat <<'EOF' >$HOME/.local/bin/auctex
+#!/bin/bash
+viewer="$(mktemp)" && chmod +x "$viewer"
+printf '#!/bin/bash\necho "$(pwd)" "$@" >>"${BASH_SOURCE[0]}"; exit\n' >"$viewer"
+handle() { cd "$1" && shift && xdg-open "$@" >/dev/null 2>/dev/null; }
+tail -fn+3 "$viewer" | (while read -r line; do handle $line; done) &
+viewerPid=$! && trap '[[ "$viewerPid" ]] && kill "$viewerPid"' EXIT
 podman run --rm -it \
     -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY --security-opt=label=disable \
     -v "$HOME/.config/auctex:/root" \
+    -v "$viewer:/usr/bin/evince" \
     -v "$HOME/.local/share/fonts:/root/.local/share/fonts" \
     -v /var/home:/var/home -w "$(pwd)" auctex /usr/bin/emacs "$@"
 EOF

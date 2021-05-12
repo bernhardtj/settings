@@ -2,6 +2,7 @@
 (setq inhibit-startup-message t)
 (show-paren-mode 1)
 (set-frame-font "Fira Code 12" nil t)
+(load-theme 'solarized-light t)
 (setq initial-major-mode 'LaTeX-mode)
 (setq initial-scratch-message
   (with-temp-buffer (insert-file-contents "~/template.tex") (buffer-string)))
