@@ -13,6 +13,7 @@
 (setq-default TeX-command-extra-options "-shell-escape")
 (add-hook 'LaTeX-mode-hook (lambda ()
 (LaTeX-math-mode)
+(prettify-symbols-mode)
 (define-key LaTeX-mode-map (kbd "C-c C-n") (lambda () (interactive)
   (setq p (line-number-at-pos))
   (shell-command-on-region (point-min) (point-max) "latexindent -m -rv" nil t)
