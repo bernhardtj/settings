@@ -24,7 +24,24 @@ EOF
     chmod +x ./*.linux
     JAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" ./*.linux auto-install.xml
     mv $HOME/STM32Cube/STM32CubeMX $HOME/STM32Cube/STM32CubeMXelf
-    printf '#!/bin/bash\nJAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" " $HOME/STM32Cube/STM32CubeMXelf" "$@"' >$HOME/STM32Cube/STM32CubeMX
+    printf '#!/bin/bash\nJAVA_HOME="$(find $HOME/.local/share/JetBrains -type d -name jbr -print -quit)" "$HOME/STM32Cube/STM32CubeMXelf" "$@"' >$HOME/STM32Cube/STM32CubeMX
     chmod +x $HOME/STM32Cube/STM32CubeMX
     ln -sf $HOME/STM32Cube/STM32CubeMX $HOME/.local/bin/STM32CubeMX
+    cat <<EOF >"$HOME/.local/share/applications/stm32cubemx.desktop"
+[Desktop Entry]
+Name=STM32CubeMX
+Icon=STM32CubeMX
+Comment=STM32CubeMX
+Exec=/var/home/jj/STM32Cube/STM32CubeMX
+Version=1.0
+Type=Application
+Categories=Development;IDE;
+Terminal=false
+StartupNotify=true
+EOF
+    identify "$HOME/STM32Cube/help/STM32CubeMX.ico" | while read line; do
+        res="$HOME/.local/share/icons/hicolor/"$(cut -d ' ' -f3 <<<"$line")"/apps"
+        mkdir -p "$res"
+        convert "$(cut -d ' ' -f1 <<<"$line")" "$res/STM32CubeMX.png"
+    done
 }
