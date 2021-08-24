@@ -22,48 +22,28 @@ _get_from_github() {
     printf "Installed %s!\n" "$(eval "$4")" >&2
 }
 
-try() {
-    declare -f "$1" >/dev/null && "$@"
-}
-
-# usage: _software_visual begin; ... ; _software_visual end;
-_software_visual() {
-    for desktop in $(try recipe_visual_bin); do
-        if [[ $1 == end ]] || [[ ! -e "$HOME/.local/share/applications/$desktop" ]]; then
-            try "recipe_visual_$1" "$desktop"
-        fi
-    done
-}
-
 _software_entrypoint() {
     cd "$(mktemp -d)"
-    if [[ $1 == recipevisual ]]; then
-        COMMAND=recipe_visual_install
-        shift
-    else
-        COMMAND=recipe_install
-    fi
-    $COMMAND
+    recipe_install
+    bash "$(dirname "${BASH_SOURCE[0]}")/99.permissions.sh"
     cd - >/dev/null
-    ${BASH_SOURCE[1]} "$@"
+    "$@"
 }
 
+_software_recipes_dir="$(dirname "${BASH_SOURCE[0]}")/software"
+shopt -s expand_aliases
+alias _software_iterate_recipes_begin='
+for recipe in "$_software_recipes_dir"/*.sh; do
+    unset -f recipe_{bin,install}
+    eval "$(cat "$recipe")"
+    for link in $(recipe_bin); do
+'
+alias _software_iterate_recipes_end='done; done'
+
 if [[ ! ${BASH_SOURCE[1]} ]]; then
-    set -e
-    cd "$(mktemp -d)"
-    for recipe in "$(dirname "${BASH_SOURCE[0]}")/software"/*.sh; do
-        unset -f recipe_{bin,install,visual_{bin,install,begin,end}}
-        eval "$(cat "$recipe")"
-        for link in $(recipe_bin); do
-            if [[ ! -e "$HOME/.local/bin/$link" ]]; then
-                cat <<EOF >"$HOME/.local/bin/$link"
-#!/bin/bash
-source "$(realpath "${BASH_SOURCE[0]}")"
-source "$(realpath "$recipe")"
-_software_entrypoint "\$@" && exit
-EOF
-            fi
-        done
-        _software_visual begin
-    done
+    _software_iterate_recipes_begin
+    if [[ ! -e "$HOME/.local/bin/$link" ]]; then
+        ln -sf "$HOME/.local/bin/"{software-update,"$link"}
+    fi
+    _software_iterate_recipes_end
 fi
