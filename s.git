@@ -7,5 +7,3 @@
 [diff]
 	tool = kitty +kitten diff
 	guitool = meld
-[hub]
-	protocol = https
