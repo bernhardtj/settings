@@ -12,7 +12,11 @@ if ! [[ -e "$ANTIGEN" ]]; then
 fi
 source "$ANTIGEN"
 antigen use oh-my-zsh
-antigen bundle git git-extras
+antigen bundle git 
+antigen bundle git-extras 
+antigen bundle github
+antigen bundle ripgrep 
+antigen bundle pip
 antigen theme robbyrussell
 antigen apply
 
