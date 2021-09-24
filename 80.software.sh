@@ -22,6 +22,20 @@ _get_from_github() {
     printf "Installed %s!\n" "$(eval "$4")" >&2
 }
 
+# _get_from_dnf: extract rpms over .local
+# usage: _get_from_dnf <package_name>
+_get_from_dnf() {
+    URLS="$(curl '-#L' "https://mirrors.fedoraproject.org/metalink?repo=fedora-$(rpm -E %fedora)&arch=$(arch)" |
+        sed -n '/>https/{s/^.*">\(http.*\)repodata.*$/\1/g;p}')"
+    for url in $URLS; do
+        pkg="$(curl '-#L' "$url/Packages/${1::1}" | grep "\"$1-" | sed 's/^.*href="\(.*rpm\)">.*$/\1/g')"
+        echo Setting up $pkg...
+        curl '-#L' "$url/Packages/${1::1}/$pkg" | rpm2cpio - | cpio -idum "./usr/*"
+        cp -r ./usr/* "$HOME/.local"
+        break
+    done
+}
+
 _software_entrypoint() {
     cd "$(mktemp -d)"
     recipe_install
