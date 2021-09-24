@@ -123,3 +123,10 @@ rpm-ostree-groupinstall () {
 rpm-ostree install $(dnf groupinfo $1 | sed -n '/Optional/q; /  /p')
 }
 
+settings_git_refresh () {
+dir=$(mktemp -d)
+git clone bernhardtj/settings $dir
+rm -rf ~/settings/.git
+mv $dir/.git ~/settings
+}
+
