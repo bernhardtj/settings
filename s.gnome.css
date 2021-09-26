@@ -1,11 +1,16 @@
 /* .local/share/gnome-shell/extensions/settings@localhost/stylesheet.css
- * overrides styling in https://gitlab.gnome.org/GNOME/gnome-shell/data/theme/gnome-shell.scss
+ * overrides styling in https://gitlab.gnome.org/GNOME/gnome-shell/-/tree/main/data/theme
  */
 
-#panel {
-    background-color: rgba(0, 0, 0, 0);
+#panel,
+.app-folder-dialog,
+.app-well-app.app-folder,
+.dash-background,
+.search-entry,
+.search-section-content {
+    background-color: transparent;
 }
 
 #panel .panel-corner {
-    -panel-corner-background-color: rgba(0, 0, 0, 0);
+    -panel-corner-background-color: transparent;
 }

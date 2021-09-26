@@ -40,7 +40,7 @@ alias math='noglob _math'
 
 dict() { curl -s "dict.org/${${*//-/}// /:}" | sed '/^2/d'; }
 
-export EDITOR='emacs -nw'
+export EDITOR=vi
 
 alias :q=exit
 alias q=exit
