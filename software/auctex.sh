@@ -4,7 +4,7 @@ recipe_bin() {
 
 recipe_install() {
     podman build -t auctex -f - <<EOF
-from texlive/texlive:latest-with-cache
+from docker.io/texlive/texlive:latest-with-cache
 run apt update && apt install -y \
 auctex \
 elpa-solarized-theme \
