@@ -32,11 +32,13 @@ const Extension = imports.gi.GObject.registerClass(class Extension extends impor
     }
 
     provision() {
+        this.window_order = this.window_order.filter((w, i) => w || i % 2);
         for (const [i, w] of this.window_order.entries()) {
+            if (!w) continue;
             w.change_workspace_by_index(~~(i / 2), true);
             const m = w.get_work_area_current_monitor();
             w.move_resize_frame(true, m.x + 10 + (i % 2) * ~~(m.width / 2), m.y + 10,
-                ~~(m.width / (1 + ((this.window_order.length - 1 !== i) || (i % 2)))) - 20, m.height - 20);
+                ~~(m.width / (1 + (this.window_order[i + 1] && (this.window_order.length - 1 !== i) || (i % 2)))) - 20, m.height - 20);
         }
     }
 
@@ -44,25 +46,29 @@ const Extension = imports.gi.GObject.registerClass(class Extension extends impor
         this._handles = [
             global.window_manager.connect('map', (_, actor) => {
                 if (actor.meta_window.get_maximized()) actor.meta_window.unmaximize(actor.meta_window.get_maximized());
-                if (actor.meta_window.allows_move() && actor.meta_window.allows_resize()
-                    && !actor.meta_window.window_type) this.window_order = this.window_order
-                    .slice(0, 2 * actor.meta_window.get_workspace().index() + 1)
-                    .concat(actor.meta_window)
-                    .concat(this.window_order.slice(2 * actor.meta_window.get_workspace().index() + 1));
+                if (actor.meta_window.allows_move() && actor.meta_window.allows_resize() && !actor.meta_window.window_type) {
+                    if (this.window_order.length < 2 * actor.meta_window.get_workspace().index())
+                        this.window_order = this.window_order.concat(new Array(
+                            2 * actor.meta_window.get_workspace().index() - this.window_order.length).fill(null));
+                    this.window_order = this.window_order
+                        .slice(0, 2 * actor.meta_window.get_workspace().index() + 1)
+                        .concat(actor.meta_window)
+                        .concat(this.window_order.slice(2 * actor.meta_window.get_workspace().index() + 1));
+                }
                 this.provision();
             }),
             global.window_manager.connect('destroy', (_, actor) => {
                 this.window_order = this.window_order.filter(w => w !== actor.meta_window);
                 this.provision();
             })];
-        ['hide-tile-preview', 'minimize', 'size-changed', 'switch-workspace', 'unminimize']
+        ['filter-keybinding', 'hide-tile-preview', 'minimize', 'size-changed', 'switch-workspace', 'unminimize']
             .forEach(signal => this._handles.push(global.window_manager.connect(signal, () => this.provision())));
         ['flop-left', 'flop-right'].forEach((name, direction) =>
             imports.ui.main.wm.addKeybinding(name, this.settings, 0, imports.gi.Shell.ActionMode.NORMAL,
                 () => {
                     const w = global.display.get_focus_window();
                     const i = this.window_order.indexOf(w);
-                    const intention = i + 2 * direction - 1;
+                    const intention = i + (2 * direction - 1) * (1 + !this.window_order[i + 2 * direction - 1]);
                     if ((intention >= 0) && (intention < this.window_order.length)) {
                         this.window_order[i] = this.window_order[intention];
                         this.window_order[intention] = w;
