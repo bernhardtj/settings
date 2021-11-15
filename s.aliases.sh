@@ -48,6 +48,7 @@ alias q=exit
 alias kitty-diff='kitty +kitten diff'
 alias icat='kitty icat'
 alias grep='kitty +kitten hyperlinked_grep'
+alias ssh='kitty +kitten ssh'
 
 alias gnu='test "$TERM" = "linux" && curl https://www.gnu.org/graphics/agnuheadterm-tty.txt || curl https://www.gnu.org/graphics/agnuheadterm-xterm.txt'
 alias fsf='echo "warranty" | bc | tail -n 5'
