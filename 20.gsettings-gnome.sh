@@ -3,6 +3,13 @@
 echo "Setting up GNOME" && tail -n+5 ${BASH_SOURCE[0]} | dconf load /
 exit
 
+[org/gnome/desktop/app-folders]
+folder-children=['Utilities', 'LibreOffice']
+
+[org/gnome/desktop/app-folders/folders/LibreOffice]
+apps=['org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.draw.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.math.desktop', 'org.libreoffice.LibreOffice.writer.desktop']
+name='LibreOffice'
+
 [org/gnome/desktop/input-sources]
 xkb-options=['caps:ctrl_modifier']
 
@@ -28,5 +35,5 @@ custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybin
 
 [org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0]
 binding='<Super>Return'
-command='.local/bin/kitty -1'
+command='kitty -1'
 name='kitty'

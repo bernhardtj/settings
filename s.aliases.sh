@@ -49,6 +49,7 @@ alias kitty-diff='kitty +kitten diff'
 alias icat='kitty icat'
 alias grep='kitty +kitten hyperlinked_grep'
 alias ssh='kitty +kitten ssh'
+alias kclip='kitty +kitten clipboard'
 
 alias gnu='test "$TERM" = "linux" && curl https://www.gnu.org/graphics/agnuheadterm-tty.txt || curl https://www.gnu.org/graphics/agnuheadterm-xterm.txt'
 alias fsf='echo "warranty" | bc | tail -n 5'
@@ -64,7 +65,7 @@ alias git=hub
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
+    alias ls='ls --color=auto --hyperlink=auto'
     #alias dir='dir --color=auto'
     #alias vdir='vdir --color=auto'
 
