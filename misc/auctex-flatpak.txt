@@ -1,0 +1,1 @@
+flatpak override --env=FLATPAK_ENABLE_SDK_EXT=texlive org.gnu.emacs
