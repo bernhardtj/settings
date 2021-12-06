@@ -62,6 +62,8 @@ alias slack-dl='curl -L -H "Authorization: Bearer $(cat $HOME/.config/slack-cli/
 
 alias git=hub
 
+alias pdfcat='gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=-'
+
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
