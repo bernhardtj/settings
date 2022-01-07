@@ -17,6 +17,6 @@ done
 exit
 
 # overrides
-user_pref("browser.startup.page", 1);
 user_pref("browser.startup.homepage", "https://start.fedoraproject.org/");
-
+user_pref("browser.startup.page", 1);
+user_pref("browser.uiCustomization.state", "{\"placements\":{\"nav-bar\":[\"urlbar-container\",\"search-container\"]}}");
