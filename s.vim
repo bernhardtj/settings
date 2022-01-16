@@ -1,11 +1,12 @@
 " .vimrc
-if empty(glob("~/.vim/autoload/plug.vim"))
-  !curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-endif
 
-call plug#begin('~/.vim/plugged')
-Plug 'morhetz/gruvbox'
-call plug#end()
+function EnsurePackage(pkg)
+    if empty(glob('~/.vim/pack/all/start/' . fnamemodify(a:pkg, ':t')))
+        execute 'silent !git clone --depth 1 https://' . a:pkg . ' ~/.vim/pack/all/start/' . fnamemodify(a:pkg, ':t')
+    endif
+endfunction
+
+call EnsurePackage('github.com/morhetz/gruvbox')
 
 set background=dark
 colorscheme gruvbox
