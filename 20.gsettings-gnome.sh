@@ -27,6 +27,9 @@ auto-raise=true
 auto-raise-delay=0
 focus-mode='mouse'
 
+[org/gnome/mutter]
+workspaces-only-on-primary=true
+
 [org/gnome/shell]
 enabled-extensions=['settings@localhost', 'places-menu@gnome-shell-extensions.gcampax.github.com']
 
