@@ -1,9 +1,17 @@
 .gitconfig
+
 [user]
-	name = bernhardtj
-	email = 31599460+bernhardtj@users.noreply.github.com
+name = bernhardtj
+email = 31599460+bernhardtj@users.noreply.github.com
+guitool = meld
+
 [merge]
-	guitool = meld
-[diff]
-	tool = kitty +kitten diff
-	guitool = meld
+tool = meld_flatpak
+
+[mergetool "meld_flatpak"]
+cmd = flatpak run --file-forwarding org.gnome.meld \"@@\" $LOCAL \"@@\" \"@@\" $BASE \"@@\" \"@@\" $REMOTE \"@@\" --output \"@@\" $MERGED \"@@\"
+
+[mergetool]
+prompt = false
+keepBackup = false
+writeToTemp = true
