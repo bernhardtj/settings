@@ -16,10 +16,14 @@ rpm-ostree update \
     --install=dnf \
     --install=g++ \
     --install=kitty \
+    --install=nc \
+    --install=nmap \
     --install=pandoc \
     --install=python3-pygments \
     --install=rclone \
     --install=ripgrep \
+    --install=rlwrap \
+    --install=screen \
     --install=shfmt \
     --install=vim-enhanced \
     --install=zsh

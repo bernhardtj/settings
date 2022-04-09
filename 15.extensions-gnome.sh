@@ -22,4 +22,15 @@ cat <<'EOF' >$PREFIX/schemas/org.gnome.shell.extensions.settings.gschema.xml
 EOF
 glib-compile-schemas $PREFIX/schemas
 
+TRAY_PREFIX=~/.local/share/gnome-shell/extensions/settings-tray@localhost
+if [[ ! -e "$TRAY_PREFIX/extension.js" ]]; then
+    rm -rf $TRAY_PREFIX
+    XDG_DATA_DIRS='' gnome-extensions create \
+        --name='Settings Tray for GNOME' \
+        --description='GNOME Shell javascript tweaks, per Settings' \
+        --uuid="settings-tray@localhost" \
+        2>/dev/null
+    curl -sLo "$TRAY_PREFIX/extension.js" https://raw.githubusercontent.com/zhangkaizhao/gnome-shell-extension-tray-icons/master/extension.js
+fi
+
 gsettings reset org.gnome.shell disable-user-extensions
