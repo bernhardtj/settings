@@ -15,10 +15,12 @@ rpm-ostree update \
     --install=ShellCheck \
     --install=dnf \
     --install=g++ \
+    --install=gitk \
     --install=kitty \
     --install=nc \
     --install=nmap \
     --install=pandoc \
+    --install=python3-devel \
     --install=python3-pygments \
     --install=rclone \
     --install=ripgrep \
