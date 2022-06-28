@@ -15,3 +15,7 @@ cmd = flatpak run --file-forwarding org.gnome.meld \"@@\" $LOCAL \"@@\" \"@@\" $
 prompt = false
 keepBackup = false
 writeToTemp = true
+
+[push]
+autoSetupRemote = true
+
