@@ -134,3 +134,6 @@ rm -rf ~/settings/.git
 mv $dir/.git ~/settings
 }
 
+dnf-quick-search () {
+curl -sL "packages.fedoraproject.org/search?query=$1" | sed -n 's,^\s*<span>\(.*\)</span></a>,\1,gp'
+}

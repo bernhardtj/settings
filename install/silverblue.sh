@@ -25,11 +25,14 @@ rpm-ostree update \
     --install=rclone \
     --install=ripgrep \
     --install=rlwrap \
+    --install=rpm-build \
+    --install=rpm-devel \
+    --install=rpmdevtools \
+    --install=rpmlint \
     --install=screen \
     --install=shfmt \
     --install=vim-enhanced \
     --install=zsh
-rpm-ostree override remove gnome-terminal gnome-terminal-nautilus
 
 sed -i 's/\(.*1000.*\)bash/\1zsh/g' /etc/passwd
 
