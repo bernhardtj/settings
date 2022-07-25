@@ -1,4 +1,4 @@
-/* .local/share/gnome-shell/extensions/settings@localhost/extension.js
+/* .local/share/gnome-shell/extensions/settings-main@localhost/extension.js
  * documentation can be found at:
  * - https://gjs-docs.gnome.org
  * - https://gitlab.gnome.org/GNOME/gnome-shell/-/tree/main/js/ui
