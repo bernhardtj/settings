@@ -6,10 +6,10 @@ function EnsurePackage(pkg)
     endif
 endfunction
 
-call EnsurePackage('github.com/morhetz/gruvbox')
+"call EnsurePackage('github.com/morhetz/gruvbox')
 
-set background=dark
-colorscheme gruvbox
+"set background=dark
+"colorscheme gruvbox
 
 set mouse=a
 set number

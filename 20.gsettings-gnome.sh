@@ -4,11 +4,7 @@ echo "Setting up GNOME" && tail -n+5 ${BASH_SOURCE[0]} | dconf load /
 exit
 
 [org/gnome/desktop/app-folders]
-folder-children=['Utilities', 'LibreOffice']
-
-[org/gnome/desktop/app-folders/folders/LibreOffice]
-apps=['org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.draw.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.math.desktop', 'org.libreoffice.LibreOffice.writer.desktop']
-name='LibreOffice'
+folder-children=['']
 
 [org/gnome/desktop/input-sources]
 xkb-options=['caps:ctrl_modifier']
@@ -31,7 +27,7 @@ focus-mode='mouse'
 workspaces-only-on-primary=true
 
 [org/gnome/shell]
-enabled-extensions=['settings@localhost', 'settings-tray@localhost', 'places-menu@gnome-shell-extensions.gcampax.github.com']
+enabled-extensions=['settings-main@localhost', 'settings-tray@localhost', 'settings-remmina@localhost', 'places-menu@gnome-shell-extensions.gcampax.github.com']
 
 [org/gnome/settings-daemon/plugins/media-keys]
 custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']

@@ -7,7 +7,7 @@ fi
 export PATH
 
 sudo () {
-    if [[ $TOOLBOX_PATH ]]; then
+    if [[ 1 ]]; then
         /bin/sudo "$@"
     elif [[ $TERM == linux ]]; then
         pkttyagent -p $$ | pkexec sh -c "cd $(pwd) && $*; killall pkttyagent"

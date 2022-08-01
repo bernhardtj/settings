@@ -1,10 +1,10 @@
-# .local/share/applications/imagemagick.desktop
+# .local/share/applications/gimp-viewer.desktop
 [Desktop Entry]
-Name=ImageMagick
-Comment=Use the ImageMagick GUI
-TryExec=/usr/bin/display
-Exec=/usr/bin/display %U
-Icon=org.gnome.eog
+Name=GIMP Viewer
+Comment=GIMP Viewer
+TryExec=/usr/bin/gimp
+Exec=/usr/bin/gimp -ds --session=gimpviewer %U
+Icon=gimp
 StartupNotify=true
 Terminal=false
 Type=Application
