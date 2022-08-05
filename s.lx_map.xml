@@ -1,0 +1,68 @@
+.config/ardour6/midi_maps/lx.map
+<?xml version="1.0" encoding="UTF-8"?>
+<ArdourMIDIBindings version="1.0.0" name="Nektar Impact LX">
+
+  <DeviceInfo bank-size="8"/>
+  
+  <!-- Buttons labelled 'track-' and 'track+' mapped to switch banks -->
+  <Binding channel="16" ctl="109" function="prev-bank"/>
+  <Binding channel="16" ctl="110" function="next-bank"/>
+
+  <!-- MixerMode -->
+  <!-- Faders mapped to track faders 1-8 and Master -->
+  <Binding channel="16" ctl="12" uri="/route/gain B1"/>
+  <Binding channel="16" ctl="13" uri="/route/gain B2"/>
+  <Binding channel="16" ctl="14" uri="/route/gain B3"/>
+  <Binding channel="16" ctl="15" uri="/route/gain B4"/>
+  <Binding channel="16" ctl="16" uri="/route/gain B5"/>
+  <Binding channel="16" ctl="17" uri="/route/gain B6"/>
+  <Binding channel="16" ctl="18" uri="/route/gain B7"/>
+  <Binding channel="16" ctl="19" uri="/route/gain B8"/>
+  <Binding channel="16" ctl="20" uri="/bus/gain master"/>
+
+  <!-- Buttons below the faders 1-8 mapped to Mute-->
+  <Binding channel="16" ctl="21" uri="/route/mute B1"/>    
+  <Binding channel="16" ctl="22" uri="/route/mute B2"/> 
+  <Binding channel="16" ctl="23" uri="/route/mute B3"/> 
+  <Binding channel="16" ctl="24" uri="/route/mute B4"/>
+  <Binding channel="16" ctl="25" uri="/route/mute B5"/>
+  <Binding channel="16" ctl="26" uri="/route/mute B6"/>
+  <Binding channel="16" ctl="27" uri="/route/mute B7"/>
+  <Binding channel="16" ctl="28" uri="/route/mute B8"/>
+  
+    
+  <!-- Button below fader 9 arms the selected track for recording -->
+  <Binding channel="16" ctl="29" uri="/route/recenable S1"/>
+  
+  <!-- Knobs mapped to pan direction. -->
+  <Binding channel="16" ctl="30" uri="/route/pandirection B1"/>
+  <Binding channel="16" ctl="31" uri="/route/pandirection B2"/>
+  <Binding channel="16" ctl="32" uri="/route/pandirection B3"/>
+  <Binding channel="16" ctl="33" uri="/route/pandirection B4"/>
+  <Binding channel="16" ctl="34" uri="/route/pandirection B5"/>
+  <Binding channel="16" ctl="35" uri="/route/pandirection B6"/>
+  <Binding channel="16" ctl="36" uri="/route/pandirection B7"/>
+  <Binding channel="16" ctl="37" uri="/route/pandirection B8"/>
+  <!-- /MixerMode -->
+  
+  <!-- InstrumemntMode -->  
+  <!-- Knobs mapped to plugin parameters -->
+  <Binding channel="16" ctl="56" uri="/route/plugin/parameter S1 1 1"/>
+  <Binding channel="16" ctl="57" uri="/route/plugin/parameter S1 1 2"/>
+  <Binding channel="16" ctl="58" uri="/route/plugin/parameter S1 1 3"/>
+  <Binding channel="16" ctl="59" uri="/route/plugin/parameter S1 1 4"/>
+  <Binding channel="16" ctl="60" uri="/route/plugin/parameter S1 1 5"/>
+  <Binding channel="16" ctl="61" uri="/route/plugin/parameter S1 1 6"/>
+  <Binding channel="16" ctl="62" uri="/route/plugin/parameter S1 1 7"/>
+  <Binding channel="16" ctl="63" uri="/route/plugin/parameter S1 1 8"/>
+  <!-- /InstrumemntMode -->   
+
+  <!-- Transport controls -->
+  <Binding channel="16" ctl="102" function="loop-toggle"/>
+  <Binding channel="16" ctl="103" action="Transport/Rewind"/>
+  <Binding channel="16" ctl="104" action="Transport/Forward"/>
+  <Binding channel="16" ctl="105" function="transport-stop"/>
+  <Binding channel="16" ctl="106" function="transport-roll"/>
+  <Binding channel="16" ctl="107" function="toggle-rec-enable"/>
+
+</ArdourMIDIBindings>
