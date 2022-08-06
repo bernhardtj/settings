@@ -10,16 +10,21 @@ set -ex
 
 rpm-ostree cancel
 rpm-ostree reset
+
+rpm-ostree cancel
 rpm-ostree update \
     --install=ImageMagick \
     --install=ShellCheck \
     --install=android-tools \
     --install=dnf \
     --install=evince \
+    --install=fira-code-fonts \
     --install=g++ \
+    --install=gh \
     --install=gimp \
     --install=gnome-console \
     --install=gnome-text-editor \
+    --install=hub \
     --install=inkscape \
     --install=kitty \
     --install=nc \
@@ -40,6 +45,7 @@ rpm-ostree update \
     --install=vim-enhanced \
     --install=zsh
 
+rpm-ostree cancel
 rpm-ostree override remove gnome-terminal gnome-terminal-nautilus
 
 sed -i 's/\(.*1000.*\)bash/\1zsh/g' /etc/passwd

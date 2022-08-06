@@ -7,19 +7,8 @@
 #        where VER completes to the version name.
 # if installer_cmd is specified, it is eval'd with the tarball root as pwd.
 _get_from_github() {
-    URL="https://github.com/$1/releases"
-    VERSION=$(curl -s "$URL/latest" | sed 's/.*tag\/\(.*\)".*/\1/g')
-    if [[ $5 ]]; then
-        dest=.
-        installer_cmd=${5//VER/${VERSION//v/}}
-    else
-        dest=$HOME/.local
-        installer_cmd=
-    fi
-    set -e
-    curl '-#L' "$URL/download/$VERSION/${2//VER/${VERSION//v/}}" | tar -x -$3 -C "$dest"
-    bash -c "cd '$dest' && eval '$installer_cmd'"
-    printf "Installed %s!\n" "$(eval "$4")" >&2
+    echo 'Tried _get_from_github! This is broken now, and not implemented.' >&2
+    exit 1
 }
 
 # _get_from_dnf: extract rpms over .local
