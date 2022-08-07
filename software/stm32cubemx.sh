@@ -1,4 +1,4 @@
-PERMALINK=https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/66/75/ec/d9/83/51/4d/d0/stm32cubemx-lin_v6-2-1/files/stm32cubemx-lin_v6-2-1.zip/jcr:content/translations/en.stm32cubemx-lin_v6-2-1.zip
+PERMALINK=https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/7b/42/34/97/63/b7/4d/05/stm32cubemx-lin_v6-6-1/files/stm32cubemx-lin_v6-6-1.zip/jcr:content/translations/en.stm32cubemx-lin_v6-6-1.zip
 
 recipe_bin() {
     echo STM32CubeMX
