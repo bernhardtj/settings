@@ -17,6 +17,7 @@ rpm-ostree update \
     --install=ShellCheck \
     --install=android-tools \
     --install=dnf \
+    --install=edk2-ovmf \
     --install=evince \
     --install=fira-code-fonts \
     --install=g++ \
@@ -27,12 +28,15 @@ rpm-ostree update \
     --install=hub \
     --install=inkscape \
     --install=kitty \
+    --install=libvirt-daemon-config-network \
+    --install=libvirt-daemon-kvm \
     --install=nc \
     --install=nmap \
     --install=p7zip-plugins \
     --install=pandoc \
     --install=python3-devel \
     --install=python3-pygments \
+    --install=qemu-kvm \
     --install=rclone \
     --install=ripgrep \
     --install=rlwrap \
@@ -42,11 +46,14 @@ rpm-ostree update \
     --install=rpmlint \
     --install=screen \
     --install=shfmt \
+    --install=swtpm-tools \
     --install=vim-enhanced \
+    --install=virt-install \
+    --install=virt-manager \
     --install=zsh
 
 rpm-ostree cancel
-rpm-ostree override remove gnome-terminal gnome-terminal-nautilus
+rpm-ostree override remove gnome-terminal gnome-terminal-nautilus gnome-tour yelp
 
 sed -i 's/\(.*1000.*\)bash/\1zsh/g' /etc/passwd
 
