@@ -4,6 +4,7 @@ hide_window_decorations yes
 font_family Fira Code
 font_size 12
 cursor_shape beam
+tab_bar_style slant
 
 # bluish elementary theme (Loki)
 # background #252e32
@@ -26,22 +27,50 @@ cursor_shape beam
 # color15 #6c71c4
 
 # new gray elementary theme (Hera)
-foreground #a5a5a5
-background #2e2e2e
-cursor #839496
-color0 #073642
-color1 #dc322f
-color2 #859900
-color3 #b58900
-color4 #268bd2
-color5 #ec0048
-color6 #2aa198
-color7 #94a3a5
-color8 #586e75
-color9 #cb4b16
-color10 #859900
-color11 #b58900
-color12 #268bd2
-color13 #d33682
-color14 #2aa198
-color15 #6c71c4
+# foreground #a5a5a5
+# background #2e2e2e
+# cursor #839496
+# color0 #073642
+# color1 #dc322f
+# color2 #859900
+# color3 #b58900
+# color4 #268bd2
+# color5 #ec0048
+# color6 #2aa198
+# color7 #94a3a5
+# color8 #586e75
+# color9 #cb4b16
+# color10 #859900
+# color11 #b58900
+# color12 #268bd2
+# color13 #d33682
+# color14 #2aa198
+# color15 #6c71c4
+
+# gnome-console theme
+color0  #241f31
+color1  #c01c28
+color2  #2ec27e
+color3  #f5c211
+color4  #1e78e4
+color5  #9841bb
+color6  #0ab9dc
+color7  #c0bfbc
+color8  #5e5c64
+color9  #ed333b
+color10 #57e389
+color11 #f8e45c
+color12 #51a1ff
+color13 #c061cb
+color14 #4fd2fd
+color15 #f6f5f4
+# hacker
+# foreground #1aff1a
+# background #0d0d0d
+# day
+# foreground #000000
+# background #ffffff
+# night
+foreground #ffffff
+background #202020
+
