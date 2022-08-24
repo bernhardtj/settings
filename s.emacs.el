@@ -5,6 +5,7 @@
 (tool-bar-mode -1)
 (set-frame-font "Fira Code 12" nil t)
 
+(xterm-mouse-mode)
 (global-set-key (kbd "<mouse-4>") (lambda () (interactive) (scroll-down 2)))
 (global-set-key (kbd "<mouse-5>") (lambda () (interactive) (scroll-up 2)))
 
