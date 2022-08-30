@@ -25,11 +25,13 @@ rpm-ostree update \
     --install=gimp \
     --install=gnome-console \
     --install=gnome-text-editor \
+    --install=gstreamer1-plugin-openh264 \
     --install=hub \
     --install=inkscape \
     --install=kitty \
     --install=libvirt-daemon-config-network \
     --install=libvirt-daemon-kvm \
+    --install=mozilla-openh264 \
     --install=nc \
     --install=nmap \
     --install=p7zip-plugins \

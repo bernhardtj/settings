@@ -40,7 +40,6 @@ sudo dnf install -y \
     vlc \
     zeitgeist \
     zsh \
-    \
     "f2*backgrounds-*gnome" \
     "f2*backgrounds-*mate" \
     fedorainfinity-backgrounds \
