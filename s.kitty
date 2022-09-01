@@ -74,3 +74,6 @@ color15 #f6f5f4
 foreground #ffffff
 background #202020
 
+map f5 set_colors --configured ~/.config/kitty/light-theme.conf
+map f6 set_colors --configured ~/.config/kitty/dark-theme.conf
+
