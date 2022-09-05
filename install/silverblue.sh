@@ -39,6 +39,7 @@ rpm-ostree update \
     --install=python3-devel \
     --install=python3-pygments \
     --install=qemu-kvm \
+    --install=qemu-user-static \
     --install=rclone \
     --install=ripgrep \
     --install=rlwrap \
