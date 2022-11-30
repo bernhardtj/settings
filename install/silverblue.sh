@@ -16,14 +16,26 @@ rpm-ostree update \
     --install=ImageMagick \
     --install=ShellCheck \
     --install=android-tools \
+    --install=cockpit \
+    --install=cockpit-composer \
+    --install=cockpit-file-sharing \
+    --install=cockpit-kdump \
+    --install=cockpit-machines \
+    --install=cockpit-navigator \
+    --install=cockpit-networkmanager \
+    --install=cockpit-ostree \
+    --install=cockpit-packagekit \
+    --install=cockpit-podman \
+    --install=cockpit-selinux \
+    --install=cockpit-session-recording \
+    --install=cockpit-sosreport \
+    --install=cockpit-storaged \
     --install=dnf \
     --install=edk2-ovmf \
-    --install=evince \
     --install=fira-code-fonts \
     --install=g++ \
     --install=gh \
     --install=gimp \
-    --install=gnome-console \
     --install=gnome-text-editor \
     --install=gstreamer1-plugin-openh264 \
     --install=hub \
@@ -66,6 +78,6 @@ systemctl enable --now rpm-ostreed-automatic.timer
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak remote-add --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
 
-flatpak remove --all -y
+#flatpak remove --all -y
 
 reboot
