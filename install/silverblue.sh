@@ -8,10 +8,13 @@ fi
 
 set -ex
 
+killall -9 gnome-software
 rpm-ostree cancel
+
 rpm-ostree reset
 
-rpm-ostree cancel
+rpm-ostree install -A https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
 rpm-ostree update \
     --install=ImageMagick \
     --install=ShellCheck \
@@ -67,7 +70,6 @@ rpm-ostree update \
     --install=virt-manager \
     --install=zsh
 
-rpm-ostree cancel
 rpm-ostree override remove gnome-terminal gnome-terminal-nautilus gnome-tour yelp
 
 sed -i 's/\(.*1000.*\)bash/\1zsh/g' /etc/passwd

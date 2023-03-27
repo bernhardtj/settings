@@ -123,10 +123,6 @@ exit
 EOF
 }
 
-rpm-ostree-groupinstall () {
-rpm-ostree install $(dnf groupinfo $1 | sed -n '/Optional/q; /  /p')
-}
-
 settings_git_refresh () {
 dir=$(mktemp -d)
 git clone --single-branch bernhardtj/settings $dir
@@ -137,3 +133,22 @@ mv $dir/.git ~/settings
 dnf-quick-search () {
 curl -sL "packages.fedoraproject.org/search?query=$1" | sed -n 's,^\s*<span>\(.*\)</span></a>,\1,gp'
 }
+
+
+rpm-ostree () {
+case "$1" in
+groupinstall)
+[[ -z "$2" ]] && echo "please pass group" && return
+/bin/rpm-ostree install $(dnf groupinfo $2 | sed -n '/Optional/q; /  /p') ;;
+versionjump)
+[[ -z "$2" ]] && echo "please pass version number" && return
+/bin/rpm-ostree rebase "fedora:fedora/$2/x86_64/silverblue" \
+--install="https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$2.noarch.rpm" \
+--install="https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$2.noarch.rpm" \
+--uninstall="rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
+--uninstall="rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm" ;;
+*) /bin/rpm-ostree "$@";;
+esac
+}
+
+
