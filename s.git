@@ -19,3 +19,5 @@ writeToTemp = true
 [push]
 autoSetupRemote = true
 
+[core]
+autocrlf = true
