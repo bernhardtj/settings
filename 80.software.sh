@@ -14,15 +14,25 @@ _get_from_github() {
 # _get_from_dnf: extract rpms over .local
 # usage: _get_from_dnf <package_name>
 _get_from_dnf() {
-    URLS="$(curl '-#L' "https://mirrors.fedoraproject.org/metalink?repo=fedora-$(rpm -E %fedora)&arch=$(arch)" |
+    pushd $(mktemp -d) 2>&1 >/dev/null
+    echo 'Fetching mirrorlist...'
+    URLS="$(curl '-sL' "https://mirrors.fedoraproject.org/metalink?repo=fedora-$(rpm -E %fedora)&arch=$(arch)" |
         sed -n '/>https/{s/^.*">\(http.*\)repodata.*$/\1/g;p}')"
     for url in $URLS; do
-        pkg="$(curl '-#L' "$url/Packages/${1::1}" | grep "\"$1-" -m1 | sed 's/^.*href="\(.*rpm\)">.*$/\1/g')"
-        echo Setting up $pkg...
-        curl '-#L' "$url/Packages/${1::1}/$pkg" | rpm2cpio - | cpio -idum "./usr/*"
+        echo "Querying $url for $1..."
+        pkg="$(curl '-sL' "$url/Packages/${1::1}" | grep "\"$1-" -m1 | sed 's/^.*href="\(.*rpm\)">.*$/\1/g')"
+        echo "Downloading $pkg..."
+        if ! curl '-#L' -o "$pkg" "$url/Packages/${1::1}/$pkg"; then
+            echo 'Download failed!'
+            break
+        fi
+        printf 'Extracting package: '
+        rpm2cpio "$pkg" | cpio -idum "./usr/*"
+        echo "Performing installation..."
         cp -r ./usr/* "$HOME/.local"
         break
     done
+    popd 2>&1 >/dev/null
 }
 
 _software_entrypoint() {
