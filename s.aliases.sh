@@ -1,7 +1,7 @@
 # .aliases
 
 # User specific environment
-if ! [[ "$PATH" =~ $HOME/.local/bin:$HOME/bin: ]]; then
+if ! [[ $PATH =~ $HOME/.local/bin:$HOME/bin: ]]; then
     PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 fi
 export PATH
@@ -71,7 +71,7 @@ see_term_colors() {
 
 settings_git_refresh() {
     dir="$(mktemp -d)"
-    git clone --single-branch bernhardtj/settings "$dir"
+    gh repo clone bernhardtj/settings -- --single-branch "$dir"
     rm -rf ~/settings/.git
     mv "$dir/.git" ~/settings
 }
@@ -79,23 +79,23 @@ settings_git_refresh() {
 rpm-ostree() {
     case "$1" in
     quick-search)
-        [[ -z "$2" ]] && echo "please pass quick search query" && return
+        [[ -z $2 ]] && echo "please pass quick search query" && return
         curl -sL "packages.fedoraproject.org/search?query=$1" | sed -n 's,^\s*<span>\(.*\)</span></a>,\1,gp'
         ;;
     copr-enable)
-        [[ -z "$2" ]] && echo "usage: copr-enable nforro/i3-gaps <optional pkg to whitelist>" && return
+        [[ -z $2 ]] && echo "usage: copr-enable nforro/i3-gaps <optional pkg to whitelist>" && return
         release_ver="$(rpm -E %fedora)"
         outfile="${1//\//\-}-fedora-$release_ver.repo"
         curl '-#Lo' "/etc/yum.repos.d/$outfile" "https://copr.fedorainfracloud.org/coprs/$1/repo/fedora-$release_ver/$outfile"
         [[ $2 ]] && echo "includepkgs=$2" >>"/etc/yum.repos.d/$outfile"
         ;;
     groupinstall)
-        [[ -z "$2" ]] && echo "please pass group" && return
+        [[ -z $2 ]] && echo "please pass group" && return
         # shellcheck disable=SC2046
         /bin/rpm-ostree install $(dnf groupinfo "$2" | sed -n '/Optional/q; /  /p')
         ;;
     versionjump)
-        [[ -z "$2" ]] && echo "please pass version number" && return
+        [[ -z $2 ]] && echo "please pass version number" && return
         /bin/rpm-ostree rebase "fedora:fedora/$2/x86_64/silverblue" \
             --install="https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$2.noarch.rpm" \
             --install="https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$2.noarch.rpm" \

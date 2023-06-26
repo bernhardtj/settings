@@ -10,6 +10,7 @@ if ! [[ -e $ANTIGEN ]]; then
     echo 'Installing Antigen...'
     curl -sL git.io/antigen -o "$ANTIGEN"
 fi
+# shellcheck disable=SC1090
 source "$ANTIGEN"
 antigen use oh-my-zsh
 antigen bundle git
