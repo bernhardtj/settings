@@ -70,10 +70,11 @@ see_term_colors() {
 }
 
 settings_git_refresh() {
-    dir="$(mktemp -d)"
-    gh repo clone bernhardtj/settings -- --single-branch "$dir"
+    pushd "$(mktemp -d)" >/dev/null 2>/dev/null
+    gh repo clone bernhardtj/settings -- --single-branch
     rm -rf ~/settings/.git
-    mv "$dir/.git" ~/settings
+    mv settings/.git ~/settings
+    popd >/dev/null 2>/dev/null
 }
 
 rpm-ostree() {

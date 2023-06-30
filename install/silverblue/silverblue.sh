@@ -1,5 +1,9 @@
 #!/bin/bash
 
+get_rpm() {
+    curl -sL "$1" | rpm2cpio | cpio -idD /
+}
+
 if [[ $UID != 0 ]]; then
     printf "settings/apply -v; . ~/.zshrc" >~/.zshrc
     pkexec bash "$(realpath "${BASH_SOURCE[0]}")"
@@ -9,6 +13,7 @@ fi
 set -ex
 
 source "$(dirname "${BASH_SOURCE[0]}")"/groups-fedora.sh
+source "$(dirname "${BASH_SOURCE[0]}")"/drivers.sh
 
 killall -9 gnome-software || true
 rpm-ostree cancel
@@ -16,16 +21,20 @@ rpm-ostree cancel
 rpm-ostree reset
 
 pkgs=(
+    rpmfusion-free-release
+    rpmfusion-nonfree-release
     "${pkgs_base[@]}"
     "${pkgs_deps[@]}"
     "${pkgs_fonts[@]}"
+    "${pkgs_drivers[@]}"
 )
 
-rpm-ostree update "${pkgs[@]/#/--install=}"
+if [[ ! -f /etc/yum.repos.d/rpmfusion-free.repo ]]; then
+    get_rpm "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
+    get_rpm "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+fi
 
-#rpm-ostree install -yA \
-#"https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
-#"https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+rpm-ostree update "${pkgs[@]/#/--install=}"
 
 rpm-ostree override remove gnome-terminal gnome-terminal-nautilus gnome-tour yelp
 

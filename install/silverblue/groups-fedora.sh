@@ -77,5 +77,4 @@ export pkgs_rpm=(
 )
 
 export pkgs_drivers=(
-    broadcom-wl
 )
