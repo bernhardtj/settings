@@ -6,9 +6,26 @@
 # usage: _get_from_github <dev/app> <filename> <tar_flag> <success_cmd> [installer_cmd]
 #        where VER completes to the version name.
 # if installer_cmd is specified, it is eval'd with the tarball root as pwd.
+#_get_from_github() {
+#    echo 'Tried _get_from_github! This is broken now, and not implemented.' >&2
+#    exit 1
+#}
+# NB endpoint $URL/releases/expanded_assets/VER could be useful for autogenerating link schema
 _get_from_github() {
-    echo 'Tried _get_from_github! This is broken now, and not implemented.' >&2
-    exit 1
+    URL="https://github.com/$1/releases"
+    VERSION="$(curl -v "$URL/latest" 2>&1 | /bin/grep location | sed 's,^.*tag/,,g' | tr -d '\r\n')"
+    printf "Found ver. $VERSION...\n"
+    if [[ $5 ]]; then
+        dest=.
+        installer_cmd=${5//VER/${VERSION//v/}}
+    else
+        dest=$HOME/.local
+        installer_cmd=
+    fi
+    set -e
+    curl '-#L' "$URL/download/$VERSION/${2//VER/${VERSION//v/}}" | tar -x -$3 -C "$dest"
+    bash -c "cd '$dest' && eval '$installer_cmd'"
+    printf "Installed %s!\n" "$(eval "$4")" >&2
 }
 
 # _get_from_dnf: extract rpms over .local
