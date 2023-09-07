@@ -33,7 +33,8 @@
  'latex-mode-hook
  (lambda ()
    (when (locate-file "pdflatex" exec-path exec-suffixes 1)
-     (ensure-package 'auctex))))
+     (ensure-package 'auctex)
+     (ensure-package 'eglot))))
 
 (add-hook
  'LaTeX-mode-hook
@@ -51,7 +52,8 @@
      (customize-set-variable (car i) (cadr i)))
    (set-face-foreground 'preview-reference-face "black")
    (LaTeX-math-mode)
-   (prettify-symbols-mode)))
+   (prettify-symbols-mode)
+   (call-interactively 'eglot)))
 
 (if (display-graphic-p)
     (add-hook

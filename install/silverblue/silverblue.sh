@@ -25,7 +25,6 @@ pkgs=(
     rpmfusion-nonfree-release
     "${pkgs_base[@]}"
     "${pkgs_deps[@]}"
-    "${pkgs_fonts[@]}"
     "${pkgs_drivers[@]}"
 )
 

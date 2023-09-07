@@ -11,6 +11,8 @@ export EDITOR=vi
 alias :q=exit
 alias q=exit
 
+alias vi=nvim
+
 alias kitty-diff='kitty +kitten diff'
 alias icat='kitty icat'
 alias grep='kitty +kitten hyperlinked_grep'

@@ -2,19 +2,17 @@
 
 export pkgs_deps=(
     ShellCheck
-    shfmt
+    fira-code-fonts
     gh
     hub
+    kitty
+    npm
+    neovim
     python3-devel
     python3-pygments
-)
-
-export pkgs_fonts=(
-    fira-code-fonts
-    kitty
-    vim-enhanced
-    zsh
     ripgrep
+    shfmt
+    zsh
 )
 
 export pkgs_tools=(
