@@ -33,6 +33,10 @@ if [[ ! -f /etc/yum.repos.d/rpmfusion-free.repo ]]; then
     get_rpm "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
 fi
 
+if [[ ! -f /etc/yum.repos.d/TurboVNC.repo ]]; then
+    curl -sLo '/etc/yum.repos.d/TurboVNC.repo' 'https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo'
+fi
+
 rpm-ostree update "${pkgs[@]/#/--install=}"
 
 rpm-ostree override remove gnome-terminal gnome-terminal-nautilus gnome-tour yelp
