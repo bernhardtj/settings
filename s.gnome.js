@@ -6,21 +6,41 @@
  * global.window_manager is a Shell.WM object.
  */
 
-const WS1 = imports.ui.workspace.WorkspaceBackground;
-const WS2 = imports.gi.GObject.registerClass(class WorkspaceBackground2 extends imports.gi.St.Widget {
+import Cairo from 'cairo';
+import System from 'system';
+
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Workspace from 'resource:///org/gnome/shell/ui/workspace.js';
+import * as Background from 'resource:///org/gnome/shell/ui/background.js';
+import * as Util from 'resource:///org/gnome/shell/misc/util.js';
+import * as extensionUtils from 'resource:///org/gnome/shell/misc/extensionUtils.js';
+
+import Adw from 'gi://Adw';
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import Gdk from 'gi://Gdk?version=4.0';
+import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk?version=4.0';
+import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
+
+const WS1 = Workspace.WorkspaceBackground;
+const WS2 = class WorkspaceBackground2 extends St.Widget {
     _init(...args) {
-        super._init({layout_manager: new imports.gi.Clutter.BinLayout()});
+        super._init({layout_manager: new Clutter.BinLayout()});
     }
-});
+}
 
 let do_not_provision = false;
 
-const Extension = imports.gi.GObject.registerClass(class Extension extends imports.gi.GObject.Object {
+export default class TheExtension extends Extension {
     get settings() {
-        if (this._settings === undefined) this._settings = new imports.gi.Gio.Settings({
-            settings_schema: imports.gi.Gio.SettingsSchemaSource.new_from_directory(
-                imports.misc.extensionUtils.getCurrentExtension().dir.get_child('schemas').get_path(),
-                imports.gi.Gio.SettingsSchemaSource.get_default(), false)
+        if (this._settings === undefined) this._settings = new Gio.Settings({
+            settings_schema: Gio.SettingsSchemaSource.new_from_directory(
+		this.path.concat('/schemas'),
+                Gio.SettingsSchemaSource.get_default(), false)
                 .lookup('org.gnome.shell.extensions.settings', true)
         });
         return this._settings;
@@ -43,7 +63,7 @@ const Extension = imports.gi.GObject.registerClass(class Extension extends impor
         for (const [i, w] of this.window_order.entries()) {
             if (!w) continue;
             w.change_workspace_by_index(i < 2 * global.display.get_n_monitors() ? 0 : ~~(i / 2) - global.display.get_n_monitors() + 1, true);
-            const m = w.get_work_area_for_monitor(i < 2 * global.display.get_n_monitors() ? ~~(i / 2) : imports.ui.main.layoutManager.primaryIndex);
+            const m = w.get_work_area_for_monitor(i < 2 * global.display.get_n_monitors() ? ~~(i / 2) : Main.layoutManager.primaryIndex);
             w.move_resize_frame(true, m.x + 10 + (i % 2) * ~~(m.width / 2), m.y + 10,
                 ~~(m.width / (1 + (this.window_order[i + 1] && (this.window_order.length - 1 !== i) || (i % 2)))) - 20, m.height - 20);
         }
@@ -70,7 +90,7 @@ const Extension = imports.gi.GObject.registerClass(class Extension extends impor
             }))).concat(['filter-keybinding', 'hide-tile-preview', 'size-changed', 'switch-workspace'].map(signal =>
             global.window_manager.connect(signal, () => this.provision())));
         ['flop-left', 'flop-right'].forEach((name, direction) =>
-            imports.ui.main.wm.addKeybinding(name, this.settings, 0, imports.gi.Shell.ActionMode.NORMAL,
+            Main.wm.addKeybinding(name, this.settings, 0, Shell.ActionMode.NORMAL,
                 () => {
                     const w = global.display.get_focus_window();
                     const i = this.window_order.indexOf(w);
@@ -81,21 +101,17 @@ const Extension = imports.gi.GObject.registerClass(class Extension extends impor
                     }
                     this.provision();
                 }));
-        imports.ui.workspace.WorkspaceBackground = WS2;
-        this.overviewBackground = new imports.ui.background.BackgroundManager({
-            monitorIndex: imports.ui.main.layoutManager.primaryIndex,
-            container: imports.ui.main.layoutManager.overviewGroup,
+        //Workspace.workspaceBackground = WS2;
+        this.overviewBackground = new Background.BackgroundManager({
+            monitorIndex: Main.layoutManager.primaryIndex,
+            container: Main.layoutManager.overviewGroup,
         });
     }
 
     disable() {
         this.handles.forEach(h => global.window_manager.disconnect(h));
-        ['flop-left', 'flop-right'].forEach(name => imports.ui.main.wm.removeKeybinding(name));
+        ['flop-left', 'flop-right'].forEach(name => Main.wm.removeKeybinding(name));
         this.overviewBackground.destroy();
-        imports.ui.workspace.WorkspaceBackground = WS1;
+	//Workspace.WorkspaceBackground = WS1;
     }
-});
-
-function init() {
-    return new Extension();
 }
