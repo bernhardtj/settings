@@ -27,7 +27,7 @@ focus-mode='mouse'
 workspaces-only-on-primary=true
 
 [org/gnome/shell]
-enabled-extensions=['settings-main@localhost', 'settings-tray@localhost', 'settings-remmina@localhost', 'places-menu@gnome-shell-extensions.gcampax.github.com']
+enabled-extensions=['settings-main@localhost', 'places-menu@gnome-shell-extensions.gcampax.github.com']
 
 [org/gnome/settings-daemon/plugins/media-keys]
 custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']

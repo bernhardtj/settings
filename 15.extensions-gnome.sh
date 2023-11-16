@@ -9,7 +9,7 @@ add() {
             --name="Settings $1 for GNOME" \
             --description='GNOME Shell javascript tweaks, per Settings' \
             --uuid="settings-$1@localhost" \
-            2>/dev/null
+            2>/dev/null && rm "$PREFIX/extension.js"
     fi
     if [[ $2 != - && ! -e "$PREFIX/extension.js" ]]; then
         curl -sLo "$PREFIX/extension.js" "$2"
@@ -34,7 +34,7 @@ EOF
 }
 
 add main - main_schema
-add tray https://raw.githubusercontent.com/zhangkaizhao/gnome-shell-extension-tray-icons/master/extension.js
-add remmina https://raw.githubusercontent.com/alexmurray/remmina-search-provider/master/extension.js
+#add tray https://raw.githubusercontent.com/zhangkaizhao/gnome-shell-extension-tray-icons/master/extension.js
+#add remmina https://raw.githubusercontent.com/alexmurray/remmina-search-provider/master/extension.js
 
 gsettings reset org.gnome.shell disable-user-extensions
