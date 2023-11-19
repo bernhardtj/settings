@@ -1,9 +1,11 @@
 #!/bin/bash
-
-if lscpu | grep 'Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz' >/dev/null 2>/dev/null; then
+case "$(lscpu)" in
+*'Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz'* | \
+    *'Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz'*)
     pkgs_drivers+=(
         broadcom-wl
     )
-fi
+    ;;
+esac
 
 export pkgs_drivers
