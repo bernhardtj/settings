@@ -22,7 +22,7 @@ export pkgs_tools=(
     rclone
     screen
     rlwrap
-    dnf
+    dnf5-plugins
     g++
     p7zip-plugins
     pandoc
