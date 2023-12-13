@@ -13,6 +13,8 @@ alias q=exit
 
 alias vi=nvim
 
+alias rpt=rpm-ostree
+
 alias kitty-diff='kitty +kitten diff'
 alias icat='kitty icat'
 alias grep='kitty +kitten hyperlinked_grep'
@@ -79,34 +81,12 @@ settings_git_refresh() {
     popd >/dev/null 2>/dev/null
 }
 
-rpm-ostree() {
-    case "$1" in
-    quick-search)
-        [[ -z $2 ]] && echo "please pass quick search query" && return
-        curl -sL "packages.fedoraproject.org/search?query=$1" | sed -n 's,^\s*<span>\(.*\)</span></a>,\1,gp'
-        ;;
-    copr-enable)
-        [[ -z $2 ]] && echo "usage: copr-enable nforro/i3-gaps <optional pkg to whitelist>" && return
-        release_ver="$(rpm -E %fedora)"
-        outfile="${1//\//\-}-fedora-$release_ver.repo"
-        curl '-#Lo' "/etc/yum.repos.d/$outfile" "https://copr.fedorainfracloud.org/coprs/$1/repo/fedora-$release_ver/$outfile"
-        [[ $2 ]] && echo "includepkgs=$2" >>"/etc/yum.repos.d/$outfile"
-        ;;
-    groupinstall)
-        [[ -z $2 ]] && echo "please pass group" && return
-        # shellcheck disable=SC2046
-        /bin/rpm-ostree install $(dnf groupinfo "$2" | sed -n '/Optional/q; /  /p')
-        ;;
-    versionjump)
-        [[ -z $2 ]] && echo "please pass version number" && return
-        /bin/rpm-ostree rebase "fedora:fedora/$2/x86_64/silverblue" \
-            --install="https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$2.noarch.rpm" \
-            --install="https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$2.noarch.rpm" \
-            --uninstall="rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
-            --uninstall="rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-        ;;
-    *) /bin/rpm-ostree "$@" ;;
-    esac
+rpt-versionjump() {
+    [[ ! $1 ]] && echo 'please pass version number' && return
+    killall -9 gnome-software
+    rpm-ostree cancel
+    rpm-ostree update --uninstall rpmfusion-free-release --uninstall rpmfusion-nonfree-release --install rpmfusion-free-release --install rpmfusion-nonfree-release
+    rpm-ostree rebase "fedora:fedora/$1/x86_64/silverblue"
 }
 
 ### Graveyard ###
