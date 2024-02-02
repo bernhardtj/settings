@@ -76,3 +76,11 @@ export pkgs_rpm=(
 
 export pkgs_drivers=(
 )
+
+export pkgs_docker=(
+    docker-ce
+    docker-ce-cli
+    containerd.io
+    docker-buildx-plugin
+    docker-compose-plugin
+)
