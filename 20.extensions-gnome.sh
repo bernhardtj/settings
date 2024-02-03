@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # test "$XDG_CURRENT_DESKTOP" = GNOME
 
+OnlineInstall() {
+    busctl --user call org.gnome.Shell.Extensions /org/gnome/Shell/Extensions org.gnome.Shell.Extensions InstallRemoteExtension s "$@"
+}
+
 add() {
     PREFIX="$HOME/.local/share/gnome-shell/extensions/settings-$1@localhost"
     if [[ $2 == - || ! -e "$PREFIX/extension.js" ]]; then
@@ -34,7 +38,16 @@ EOF
 }
 
 add main - main_schema
-#add tray https://raw.githubusercontent.com/zhangkaizhao/gnome-shell-extension-tray-icons/master/extension.js
-#add remmina https://raw.githubusercontent.com/alexmurray/remmina-search-provider/master/extension.js
-
 gsettings reset org.gnome.shell disable-user-extensions
+
+remote_exts=(
+    appindicatorsupport@rgcjonas.gmail.com
+)
+
+for i in "${remote_exts[@]}"; do
+    if ! gnome-extensions list | grep "$i" >/dev/null 2>&1; then
+        OnlineInstall "$i"
+    fi
+    gnome-extensions enable "$i"
+done
+gnome-extensions enable settings-main@localhost
