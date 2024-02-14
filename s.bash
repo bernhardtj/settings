@@ -31,19 +31,9 @@ GIT_PS1_SHOWSTASHSTATE=1
 GIT_PS1_SHOWUPSTREAM='auto'
 GIT_PS1_STATESEPARATOR=''
 GIT_PS1_DESCRIBE_STYLE='default'
+GIT_PS1_SHOWCOLORHINTS=1
 
-if [[ $TERM == *color* ]]; then
-    GIT_PS1_SHOWCOLORHINTS=1
-    _c_code() {
-        printf '\033[%sm' "$(printf ';%s' "$@")"
-    }
-else
-    _c_code() {
-        :
-    }
-fi
-
-PROMPT_FMT='$((($?)) && _c_code 1 31 || _c_code 1 32)$([[ $SSH_CONNECTION ]] && printf "\h" || printf "➜")  $(_c_code 1 36)\W$(_c_code 0)'
+PROMPT_FMT='$((($?)) && printf "\[\e[31;1m\]" ||  printf "\[\e[32;1m\]")$([[ $SSH_CONNECTION ]] && printf "\h" || printf "➜ ") \[\e[36;1m\]\W\[\e[0m\]'
 
 if declare -f __git_ps1 >/dev/null; then
     PROMPT_COMMAND='__git_ps1 "$PROMPT_FMT" " "'

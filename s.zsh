@@ -18,8 +18,18 @@ antigen bundle git-extras
 antigen bundle github
 antigen bundle ripgrep
 antigen bundle pip
-antigen theme robbyrussell
+#antigen theme robbyrussell
 antigen apply
+
+host_info='$([[ $SSH_CONNECTION ]] && printf "%%m" || printf "➜ ")'
+
+PROMPT="%(?:%{$fg_bold[green]%}$host_info:%{$fg_bold[red]%}$host_info) %{$fg[cyan]%}%c%{$reset_color%}"
+PROMPT+=' $(git_prompt_info)'
+
+ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}git:(%{$fg[red]%}"
+ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%} "
+ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[blue]%}) %{$fg[yellow]%}✗"
+ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[blue]%})"
 
 if test -n "$KITTY_INSTALLATION_DIR"; then
     export KITTY_SHELL_INTEGRATION="enabled"
