@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+
+<remote  name="github" fetch="https://github.com" />
+
+<default revision="main"
+         remote="github"
+         sync-c="true"
+         sync-j="4" />
+
+<project path="/path/to/folder" name="user/project" remote="github" revision="main" />
+</manifest>
+
+<!-- 
+cat .gitignore << EOF
+*
+!.gitignore
+!default.xml
+EOF
+this file: default.xml
+git init; git commit; repo init -u .git
+--> 
