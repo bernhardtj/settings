@@ -57,14 +57,11 @@ export pkgs_base=(
 )
 
 export pkgs_virt=(
-    swtpm-tools
-    edk2-ovmf
-    libvirt-daemon-config-network
-    libvirt-daemon-kvm
-    qemu-kvm
-    qemu-user-static
+    cockpit
+    cockpit-machines
+    guestfs-tools
+    qemu-kvm-core
     virt-install
-    virt-manager
 )
 
 export pkgs_rpm=(
