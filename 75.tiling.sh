@@ -1,6 +1,9 @@
-/* .config/gtk-3.0/gtk.css
- */
+#!/bin/bash
+# false
 
+echo 'hide_window_decorations yes' >>~/.config/kitty/kitty.conf
+
+cat <<EOF >.config/gtk-3.0/gtk.css
 window.ssd separator:first-child + headerbar:backdrop,
 window.ssd separator:first-child + headerbar,
 window.ssd headerbar:first-child:backdrop,
@@ -30,4 +33,11 @@ window.ssd headerbar.titlebar button.titlebutton {
     min-height: 0;
     padding: 0;
 }
+EOF
 
+dconf load / <<EOF
+[org/gnome/desktop/wm/preferences]
+auto-raise=true
+auto-raise-delay=0
+focus-mode='mouse'
+EOF

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test "$XDG_CURRENT_DESKTOP" = GNOME
+# [[ "$XDG_CURRENT_DESKTOP" =~ GNOME ]]
 echo "Setting up GNOME" && tail -n+5 ${BASH_SOURCE[0]} | dconf load /
 exit
 
@@ -17,11 +17,6 @@ tap-to-click=true
 
 [org/gnome/desktop/peripherals/trackball]
 scroll-wheel-emulation-button=2
-
-[org/gnome/desktop/wm/preferences]
-auto-raise=true
-auto-raise-delay=0
-focus-mode='mouse'
 
 [org/gnome/mutter]
 workspaces-only-on-primary=true

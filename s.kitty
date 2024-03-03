@@ -1,6 +1,5 @@
 # .config/kitty/kitty.conf
 # enabled_layouts grid
-hide_window_decorations yes
 font_family Fira Code
 font_size 12
 cursor_shape beam
