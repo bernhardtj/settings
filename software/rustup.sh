@@ -4,5 +4,4 @@ recipe_bin() {
 
 recipe_install() {
     curl -sLo "$HOME"/.local/bin/rustup-init sh.rustup.rs
-    chmod +x "$HOME"/.local/bin/rustup-init
 }

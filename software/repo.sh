@@ -4,5 +4,4 @@ recipe_bin() {
 
 recipe_install() {
     curl '-#Lo' ~/.local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo
-    chmod a+rx ~/.local/bin/repo
 }
