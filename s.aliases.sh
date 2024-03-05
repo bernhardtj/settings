@@ -43,6 +43,8 @@ if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto --hyperlink=auto'
 fi
 
+cdd() { cd -"$(d | /bin/grep "$1" | cut -d$'\t' -f1)"; }
+
 # some more ls aliases
 alias ll='ls -alF'
 alias la='ls -A'
