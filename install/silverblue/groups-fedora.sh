@@ -65,6 +65,7 @@ export pkgs_virt=(
 )
 
 export pkgs_rpm=(
+    createrepo_c
     rpm-build
     rpm-devel
     rpmdevtools
