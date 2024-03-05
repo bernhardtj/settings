@@ -33,8 +33,6 @@ alias proc='ps a -u $(whoami)'
 
 alias slack-dl='curl -L -H "Authorization: Bearer $(cat $HOME/.config/slack-cli/slack_token)"'
 
-alias git=hub
-
 alias pdfcat='gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=-'
 
 dict() { zsh -c 'curl -s "dict.org/${${*//-/}// /:}"' "$@" | sed '/^2/d'; }
