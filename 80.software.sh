@@ -13,7 +13,9 @@
 # NB endpoint $URL/releases/expanded_assets/VER could be useful for autogenerating link schema
 _get_from_github() {
     URL="https://github.com/$1/releases"
-    VERSION="$(curl -v "$URL/latest" 2>&1 | /bin/grep location | sed 's,^.*tag/,,g' | tr -d '\r\n')"
+    if [[ ! $VERSION ]]; then
+        VERSION="$(curl -v "$URL/latest" 2>&1 | /bin/grep location | sed 's,^.*tag/,,g' | tr -d '\r\n')"
+    fi
     printf "Found ver. $VERSION...\n"
     if [[ $5 ]]; then
         dest=.
