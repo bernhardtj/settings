@@ -92,6 +92,11 @@ rpt-versionjump() {
     rpm-ostree rebase "fedora:fedora/$1/x86_64/silverblue"
 }
 
+repo() {
+    [[ -f .repo/repo/repo ]] && install -Dm755 .repo/repo/repo ~/.local/bin/repo
+    ~/.local/bin/repo "$@"
+}
+
 ### Graveyard ###
 
 # colored GCC warnings and errors
