@@ -34,10 +34,6 @@ if [[ ! -f /etc/yum.repos.d/rpmfusion-free.repo ]]; then
     get_rpm "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
 fi
 
-if [[ ! -f /etc/yum.repos.d/TurboVNC.repo ]]; then
-    curl -sLo '/etc/yum.repos.d/TurboVNC.repo' 'https://turbovnc.org/pmwiki/uploads/Downloads/TurboVNC.repo'
-fi
-
 if [[ ! -f /etc/yum.repos.d/docker-ce.repo ]]; then
     curl -sLo '/etc/yum.repos.d/docker-ce.repo' 'https://download.docker.com/linux/fedora/docker-ce.repo'
 fi
