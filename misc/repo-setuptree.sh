@@ -18,10 +18,12 @@ cat <<'EOF' >default.xml
 
 <default revision="main"
          remote="github"
-         sync-c="true"
-         sync-j="4" />
+         sync-c="false"
+         sync-s="true"
+         sync-tags="true"
+         sync-j="4"/>
 
-<!-- <project path="/path/to/folder" name="user/project" remote="github" revision="main" /> -->
+<!-- <project alias="myproj" path="/path/to/folder" name="user/project" remote="github" revision="main" /> -->
 </manifest>
 EOF
 
