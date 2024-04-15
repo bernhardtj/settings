@@ -1,5 +1,5 @@
 #!/bin/bash
-# false
+# [ -f ~/.tiling ]
 
 echo 'hide_window_decorations yes' >>~/.config/kitty/kitty.conf
 
