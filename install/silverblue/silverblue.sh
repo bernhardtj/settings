@@ -42,6 +42,9 @@ rpm-ostree update "${pkgs[@]/#/--install=}"
 
 rpm-ostree override remove gnome-terminal gnome-terminal-nautilus gnome-tour yelp
 
+# openh264 >f40
+rpm-ostree override remove noopenh264 --install openh264 --install mozilla-openh264
+
 sed -i 's/\(.*1000.*\)bash/\1zsh/g' /etc/passwd
 
 sed s/^#A/A/g\;s/none/stage/g /usr/etc/rpm-ostreed.conf >/etc/rpm-ostreed.conf

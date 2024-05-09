@@ -4,7 +4,6 @@ export pkgs_deps=(
     ShellCheck
     fira-code-fonts
     gh
-    hub
     kitty
     npm
     neovim
@@ -52,8 +51,6 @@ export pkgs_apps=(
 )
 
 export pkgs_base=(
-    gstreamer1-plugin-openh264
-    mozilla-openh264
 )
 
 export pkgs_virt=(
