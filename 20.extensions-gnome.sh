@@ -42,6 +42,7 @@ gsettings reset org.gnome.shell disable-user-extensions
 
 remote_exts=(
     appindicatorsupport@rgcjonas.gmail.com
+    panel-workspace-scroll@polymeilex.github.io
 )
 
 for i in "${remote_exts[@]}"; do
