@@ -44,6 +44,10 @@ _get_from_dnf() {
 }
 
 _software_entrypoint() {
+    if ! nm-online -qx; then
+        echo 'settings/software: offline; doing nothing.' >&2
+        return 1
+    fi
     cd "$(mktemp -d)"
     recipe_install
     bash "$_software_recipes_dir/../99.permissions.sh"
