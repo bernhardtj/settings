@@ -5,6 +5,9 @@
 (tool-bar-mode -1)
 (set-frame-font "Fira Code 12" nil t)
 
+(setenv "PATH" (concat (getenv "PATH") ":" (getenv "HOME") "/.local/bin"))
+(setq exec-path (append exec-path '((concat (getenv "HOME") "/.local/bin"))))
+
 (xterm-mouse-mode)
 (global-set-key (kbd "<mouse-4>") (lambda () (interactive) (scroll-down 2)))
 (global-set-key (kbd "<mouse-5>") (lambda () (interactive) (scroll-up 2)))
@@ -29,10 +32,36 @@
 (let ((hs (locate-file "hunspell" exec-path exec-suffixes 1)))
   (when hs (setq ispell-program-name hs)))
 
+(setq-default
+ eglot-workspace-configuration
+ '(
+   :texlab (
+	    :auxDirectory "."
+	    :bibtexFormatter "texlab"
+	    :build (
+		    :args ["-X" "compile" "%f" "--synctex" "--keep-logs" "--keep-intermediates"]
+		    :executable "tectonic"
+		    :forwardSearchAfter t
+		    :onSave t)
+
+	    :chktex (
+		     :onEdit t
+		     :onOpenAndSave t)
+
+	    :diagnosticsDelay 300
+	    :formatterLineLength 80
+	    :forwardSearch
+	    (
+	     :executable "evince-synctex" ;broken in flatpak due to python `import dbus` failing
+	     :args ["-f" "%l" "%p" "\"code-g%f:%l\""])
+	    :latexFormatter "latexindent"
+	    :latexindent (
+			  :modifyLineBreaks :json-false))))
+
 (add-hook
  'latex-mode-hook
  (lambda ()
-   (when (locate-file "pdflatex" exec-path exec-suffixes 1)
+   (when t ;(locate-file "pdflatex" exec-path exec-suffixes 1)
      (ensure-package 'auctex)
      (ensure-package 'eglot))))
 
@@ -53,7 +82,7 @@
    (set-face-foreground 'preview-reference-face "black")
    (LaTeX-math-mode)
    (prettify-symbols-mode)
-   (call-interactively 'eglot)))
+   (eglot-ensure)))
 
 (if (display-graphic-p)
     (add-hook
