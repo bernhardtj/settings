@@ -1,16 +1,11 @@
 #!/bin/bash
 
 export pkgs_deps=(
-    ShellCheck
     fira-code-fonts
-    gh
     kitty
     npm
     neovim
-    python3-devel
-    python3-pygments
     ripgrep
-    shfmt
     zsh
 )
 
@@ -18,13 +13,8 @@ export pkgs_tools=(
     android-tools
     nc
     nmap
-    rclone
-    screen
-    rlwrap
     dnf5-plugins
-    g++
     p7zip-plugins
-    pandoc
 )
 
 export pkgs_cockpit=(

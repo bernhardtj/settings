@@ -1,5 +1,5 @@
 #!/bin/bash
-# test -e /usr/bin/lesspipe.sh && ! test -e ~/.lessfilter
+# test -e /usr/bin/lesspipe.sh
 cat <<EOF >~/.lessfilter
 #!/usr/bin/sh
 case "\$1" in
