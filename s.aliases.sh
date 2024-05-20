@@ -9,6 +9,9 @@ export PATH
 #conda
 [[ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]] && source "$HOME/anaconda3/etc/profile.d/conda.sh"
 
+#rust
+[[ -d "$HOME/.cargo" ]] && source "$HOME/.cargo/env"
+
 export EDITOR=vi
 
 alias :q=exit
