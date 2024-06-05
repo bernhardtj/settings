@@ -88,6 +88,10 @@ parse_args() {
             MODE=install
             _flag_store_to=BIN
             ;;
+        -r | --recipe)
+            MODE=show_recipe
+            _flag_store_to=BIN
+            ;;
         *)
             if [[ $_flag_store_to ]]; then
                 eval "$_flag_store_to=$1"
@@ -143,6 +147,16 @@ main() {
         if [[ $link == "$BIN" ]]; then
             for b in $(recipe_bin); do rm -f "$HOME/.local/bin/$b"; done
             _software_entrypoint "${CONTINUE_ARGS[@]}"
+            exit $?
+        fi
+        _software_iterate_recipes_end
+        echo "settings/software: couldn't find a recipe for $BIN." >&2
+        exit 1
+        ;;
+    show_recipe)
+        _software_iterate_recipes_begin
+        if [[ $link == "$BIN" ]]; then
+            declare -f recipe_install
             exit $?
         fi
         _software_iterate_recipes_end
