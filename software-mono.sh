@@ -2,12 +2,22 @@
 
 _software_recipes_dir="$HOME/settings/software"
 
-_get_from_github() {
+_get_from_mason() {
+    nvim --headless -c 'Mason' -c "MasonInstall --force $1" -c 'quitall'
+    echo
+}
+
+_get_dl_link_from_github() {
     URL="https://github.com/$1/releases"
     if [[ ! $VERSION ]]; then
         VERSION="$(curl -v "$URL/latest" 2>&1 | /bin/grep location | sed 's,^.*tag/,,g' | tr -d '\r\n')"
     fi
-    printf "Found ver. $VERSION...\n"
+    printf "Found ver. %s...\n" "$VERSION" >&2
+    echo "$URL/download/$VERSION/${2//VER/${VERSION//v/}}"
+}
+
+_get_from_github() {
+    set -e
     if [[ $5 ]]; then
         dest=.
         installer_cmd=${5//VER/${VERSION//v/}}
@@ -16,9 +26,11 @@ _get_from_github() {
         installer_cmd=
     fi
     set -e
-    curl '-#L' "$URL/download/$VERSION/${2//VER/${VERSION//v/}}" | tar -x -$3 -C "$dest"
+    # shellcheck disable=SC2086
+    curl '-#L' "$(_get_dl_link_from_github "$1" "$2")" | tar -x -$3 -C "$dest"
     bash -c "cd '$dest' && eval '$installer_cmd'"
     printf "Installed %s!\n" "$(eval "$4")" >&2
+    set +e
 }
 
 _get_from_dnf() {

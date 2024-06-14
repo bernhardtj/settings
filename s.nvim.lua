@@ -1,82 +1,51 @@
 -- .config/nvim/init.lua
 
 function EnsurePackage(url)
-ep_prefix = vim.fn.stdpath('data')..'/site/pack/ensurepackage/opt/'
-if vim.fn.isdirectory(ep_prefix..url) == 0 then
-	vim.cmd('!git clone --depth 1 https://'..url..' '..ep_prefix..url)
+	local ep_prefix
+	ep_prefix = vim.fn.stdpath("data") .. "/site/pack/ensurepackage/opt/"
+	if vim.fn.isdirectory(ep_prefix .. url) == 0 then
+		vim.cmd("!git clone --depth 1 --filter blob:none https://" .. url .. " " .. ep_prefix .. url)
+	end
+	vim.cmd("packadd! " .. url)
 end
-vim.cmd('packadd! '..url)
-end
 
-EnsurePackage('github.com/neovim/nvim-lspconfig')
+EnsurePackage("github.com/folke/lazy.nvim.git")
 
-require'lspconfig'.bashls.setup{}
-require'lspconfig'.pyright.setup{}
-require'lspconfig'.texlab.setup{
-  settings = {
-    texlab = {
-      auxDirectory = ".",
-      bibtexFormatter = "texlab",
-      build = {
-        args = { "-X", "compile", "%f", "--synctex", "--keep-logs", "--keep-intermediates" },
-        executable = "tectonic",
-        forwardSearchAfter = true,
-        onSave = true
-      },
-      chktex = {
-        onEdit = true,
-        onOpenAndSave = true
-      },
-      diagnosticsDelay = 300,
-      formatterLineLength = 80,
-      forwardSearch = {
-	executable = "evince-synctex",
-        args = { "-f", "%l", "%p", "\"code -g %f:%l\"" }
-      },
-      latexFormatter = "latexindent",
-      latexindent = {
-        modifyLineBreaks = false
-      }
-    }
-  }
-}
-
-
-
--- Global mappings.
--- See `:help vim.diagnostic.*` for documentation on any of the below functions
-vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
-
--- Use LspAttach autocommand to only map the following keys
--- after the language server attaches to the current buffer
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-  callback = function(ev)
-    -- Enable completion triggered by <c-x><c-o>
-    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
-
-    -- Buffer local mappings.
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
-    local opts = { buffer = ev.buf }
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-    vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
-    vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
-    vim.keymap.set('n', '<space>wl', function()
-      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, opts)
-    vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
-    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
-    vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, opts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-    vim.keymap.set('n', '<space>f', function()
-      vim.lsp.buf.format { async = true }
-    end, opts)
-  end,
+require("lazy").setup({
+	spec = {
+		-- add LazyVim and import its plugins
+		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
+		-- import any extras modules here
+		-- { import = "lazyvim.plugins.extras.lang.typescript" },
+		-- { import = "lazyvim.plugins.extras.lang.json" },
+		-- { import = "lazyvim.plugins.extras.ui.mini-animate" },
+		-- import/override with your plugins
+		{ import = "plugins" },
+	},
+	defaults = {
+		-- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
+		-- If you know what you're doing, you can set this to `true` to have all your custom plugins lazy-loaded by default.
+		lazy = false,
+		-- It's recommended to leave version=false for now, since a lot the plugin that support versioning,
+		-- have outdated releases, which may break your Neovim install.
+		version = false, -- always use the latest git commit
+		-- version = "*", -- try installing the latest stable version for plugins that support semver
+	},
+	install = { colorscheme = { "tokyonight", "habamax" } },
+	checker = { enabled = false }, -- automatically check for plugin updates
+	performance = {
+		rtp = {
+			-- disable some rtp plugins
+			disabled_plugins = {
+				"gzip",
+				-- "matchit",
+				-- "matchparen",
+				-- "netrwPlugin",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+			},
+		},
+	},
 })
