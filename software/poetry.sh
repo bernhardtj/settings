@@ -3,5 +3,5 @@ recipe_bin() {
 }
 
 recipe_install() {
-    pip install poetry
+    pipx install -f poetry
 }

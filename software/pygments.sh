@@ -5,6 +5,6 @@ EOF
 }
 
 recipe_install() {
-    pip install --user --force-reinstall pygments
+    pipx install -f pygments
     rm -f "$HOME/.lessfilter"
 }
