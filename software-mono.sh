@@ -81,6 +81,15 @@ alias _software_iterate_recipes_end='done; done'
 
 usage() {
     echo 'settings/software: usage error'
+    cat <<EOF
+usage:
+    $(basename "$0") <options> [<target>]
+
+options:
+    -s, --setup       set up symlinks for on-demand installations
+    -i, --install     install/update target
+    -r, --recipe      print the recipe for target
+EOF
     exit "$@"
 }
 
