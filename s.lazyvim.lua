@@ -12,6 +12,7 @@ return {
 			servers = {
 				pyright = {},
 				bashls = {},
+				rust_analyzer = {},
 				texlab = {
 					settings = {
 						texlab = {
