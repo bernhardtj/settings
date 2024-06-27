@@ -1,0 +1,10 @@
+#!/bin/bash
+
+createrepo_c ~/rpmbuild/RPMS
+cat <<EOF
+[rpmbuild]
+name=rpmbuild                                                                                                           
+baseurl=file://$(HOME)/rpmbuild/RPMS                                                                       
+enabled=1                                                                                                                                           
+gpgcheck=0                                                                                                                                          
+EOF

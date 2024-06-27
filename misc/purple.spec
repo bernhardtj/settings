@@ -1,3 +1,7 @@
+#rpmbuild -ba -D 'forgeurl https://github.com/EionRobb/purple-teams' -D 'branch master' -D 'release 1.0' -D 'build make' -D 'install %make_install' ~/rpmbuild/SPECS/forge.SPECS
+#deps  glib2-devel json-glib-devel libpurple-devel
+
+
 Name:       EionRobb-purple-teams
 Version:    c01fddf
 Release:    1
