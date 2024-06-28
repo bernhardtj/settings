@@ -4,7 +4,7 @@ font_family Fira Code
 font_size 12
 cursor_shape beam
 tab_bar_style slant
-
+wayland_titlebar_color #202020
 # bluish elementary theme (Loki)
 # background #252e32
 # foreground #94a3a5
