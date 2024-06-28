@@ -41,3 +41,5 @@ auto-raise=true
 auto-raise-delay=0
 focus-mode='mouse'
 EOF
+
+gnome-extensions enable settings-main@localhost

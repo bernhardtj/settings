@@ -51,4 +51,3 @@ for i in "${remote_exts[@]}"; do
     fi
     gnome-extensions enable "$i"
 done
-gnome-extensions enable settings-main@localhost
