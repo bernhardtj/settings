@@ -15,6 +15,7 @@ export pkgs_tools=(
     nmap
     dnf5-plugins
     p7zip-plugins
+    quilt
 )
 
 export pkgs_cockpit=(
