@@ -12,6 +12,10 @@ export PATH
 #rust
 [[ -d "$HOME/.cargo" ]] && source "$HOME/.cargo/env"
 
+#motd
+[[ -f "$HOME/.motd" ]] && cat "$HOME/.motd"
+(motd-update >~/.motd &)
+
 export EDITOR=vi
 
 alias :q=exit
