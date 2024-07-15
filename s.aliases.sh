@@ -42,6 +42,8 @@ alias slack-dl='curl -L -H "Authorization: Bearer $(cat $HOME/.config/slack-cli/
 
 alias pdfcat='gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=-'
 
+alias lidswitch-inhibit='systemd-inhibit --what=handle-lid-switch bash -c "echo press ^D to stop inhibiting lid switch; cat"'
+
 dict() { zsh -c 'curl -s "dict.org/${${*//-/}// /:}"' "$@" | sed '/^2/d'; }
 
 # enable color support of ls and also add handy aliases
