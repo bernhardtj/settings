@@ -42,9 +42,10 @@ alias slack-dl='curl -L -H "Authorization: Bearer $(cat $HOME/.config/slack-cli/
 
 alias pdfcat='gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=-'
 
-alias _quilt_push_a='git apply $(find patches -type f | sort)'
-alias _quilt_pop_a='git apply -R $(find patches -type f | sort -r)'
-alias _quilt_series_refresh='mkdir -p .pc && ls patches | sort > .pc/series'
+alias _quiltp='test -d patches || {echo "not a quilt tree; doing nothing."; exit 1}'
+alias _quilt_series_refresh='_quiltp && mkdir -p .pc && ls patches | sort > .pc/series'
+alias _quilt_push_a='_quilt_series_refresh && git apply $(find patches -type f | sort)'
+alias _quilt_pop_a='_quilt_series_refresh && git apply -R $(find patches -type f | sort -r)'
 
 alias lidswitch-inhibit='systemd-inhibit --what=handle-lid-switch bash -c "echo press ^D to stop inhibiting lid switch; cat"'
 
