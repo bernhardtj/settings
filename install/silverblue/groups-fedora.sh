@@ -11,9 +11,10 @@ export pkgs_deps=(
 
 export pkgs_tools=(
     android-tools
+    dnf5-plugins
+    gitk
     nc
     nmap
-    dnf5-plugins
     p7zip-plugins
     quilt
 )
@@ -69,4 +70,8 @@ export pkgs_docker=(
     containerd.io
     docker-buildx-plugin
     docker-compose-plugin
+)
+
+export pkgs_misc=(
+    waydroid
 )
