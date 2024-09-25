@@ -40,7 +40,7 @@ fi
 
 rpm-ostree update "${pkgs[@]/#/--install=}"
 
-rpm-ostree override remove gnome-terminal gnome-terminal-nautilus gnome-tour yelp
+rpm-ostree override remove ptyxis gnome-tour yelp
 
 # openh264 >f40
 rpm-ostree override remove noopenh264 --install openh264 --install mozilla-openh264

@@ -3,7 +3,7 @@
 
 echo 'hide_window_decorations yes' >>~/.config/kitty/kitty.conf
 
-cat <<EOF >.config/gtk-3.0/gtk.css
+cat <<EOF >~/.config/gtk-3.0/gtk.css
 window.ssd separator:first-child + headerbar:backdrop,
 window.ssd separator:first-child + headerbar,
 window.ssd headerbar:first-child:backdrop,
