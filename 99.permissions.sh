@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
 # true
-shfmt -s -i 4 -w "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null
-(zsh -c "rm -- $HOME/**(-@D)" || find ~ -xtype l -delete) 2>/dev/null
-find "$(dirname "${BASH_SOURCE[0]}")" -type f -exec chmod 644 {} \;
-find "$(dirname "${BASH_SOURCE[0]}")" -type d -exec chmod 755 {} \;
-chmod 755 "$HOME"/.local/bin/* "$(dirname "${BASH_SOURCE[0]}")/apply"
-chmod 600 ~/.ssh/*
-find "$HOME" -maxdepth 1 -type d -empty -exec rmdir {} \;
+
+settings_folder="$(dirname "${BASH_SOURCE[0]}")"
+
+# delete empty directories and broken symlinks
+find "$HOME" -mount -maxdepth 1 -type d -empty -delete 2>/dev/null
+find "$HOME" -mount -xtype l -delete 2>/dev/null
+
+# run shfmt on scripts
+shfmt -s -i 4 -w "$settings_folder" 2>/dev/null
+
+# set permissions
+find "$settings_folder" -mount -type f -exec chmod 644 {} \; 2>/dev/null
+find "$settings_folder" -mount -type d -exec chmod 755 {} \; 2>/dev/null
+find "$HOME/.local/bin" -mount -maxdepth 1 -exec chmod 755 {} \; 2>/dev/null
+find "$HOME/.ssh" -mount -type f -exec chmod 600 {} \; 2>/dev/null
+
+chmod 755 "$settings_folder/apply"
