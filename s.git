@@ -6,10 +6,10 @@ email = 31599460+bernhardtj@users.noreply.github.com
 guitool = meld
 
 [merge]
-tool = meld_flatpak
+tool = autotool
 
-[mergetool "meld_flatpak"]
-cmd = flatpak run --file-forwarding org.gnome.meld \"@@\" $LOCAL \"@@\" \"@@\" $BASE \"@@\" \"@@\" $REMOTE \"@@\" --output \"@@\" $MERGED \"@@\"
+[mergetool "autotool"]
+cmd = ~/.local/bin/auto-mergetool "$LOCAL" "$REMOTE" "$BASE" "$MERGED"
 
 [mergetool]
 prompt = false
