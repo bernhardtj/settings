@@ -9,6 +9,15 @@ export pkgs_deps=(
     zsh
 )
 
+export pkgs_deps_bluefin=(
+    fira-code-fonts
+    kitty
+    neovim
+    npm
+    quilt
+    remmina
+)
+
 export pkgs_tools=(
     android-tools
     dnf5-plugins
