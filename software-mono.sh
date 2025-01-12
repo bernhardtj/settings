@@ -1,4 +1,22 @@
 #!/bin/bash
+#
+# Ideas
+# implement pulls file which is a list of target names
+# when install is called, target is inserted into pulls file
+#
+# additional recipe sections
+# recipe_update
+# recipe_checkupdate
+# recipe_repair
+# recipe_clean
+#
+# these sections are blocked 'nothing to do' if target is not in pulls file
+# flags -u, -r, -c etc.
+# flag -a --all which loops over pulls file performing action
+#
+# software-update -ua run in background on timer
+#
+# homebrew exists but is probably not useful
 
 _software_recipes_dir="$HOME/settings/software"
 
