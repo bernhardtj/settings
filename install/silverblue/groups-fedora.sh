@@ -26,6 +26,7 @@ export pkgs_tools=(
     nmap
     p7zip-plugins
     quilt
+    ddcutil
 )
 
 export pkgs_cockpit=(
