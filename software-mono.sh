@@ -80,7 +80,7 @@ _software_entrypoint() {
     fi
     cd "$(mktemp -d)"
     recipe_install
-    bash "$_software_recipes_dir/../99.permissions.sh"
+    bash "$_software_recipes_dir/../84.permissions.sh"
     cd - >/dev/null
     if [[ "$*" ]]; then
         "$@"
