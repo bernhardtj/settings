@@ -41,8 +41,11 @@ add main - main_schema
 gsettings reset org.gnome.shell disable-user-extensions
 
 remote_exts=(
-    appindicatorsupport@rgcjonas.gmail.com
     panel-workspace-scroll@polymeilex.github.io
+    status-icons@gnome-shell-extensions.gcampax.github.com
+    blur-my-shell@aunetx
+    caffeine@patapon.info
+    dash-to-dock@micxgx.gmail.com
 )
 
 for i in "${remote_exts[@]}"; do

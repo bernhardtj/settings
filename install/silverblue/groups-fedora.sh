@@ -3,8 +3,9 @@
 export pkgs_deps=(
     fira-code-fonts
     kitty
-    npm
     neovim
+    npm
+    papirus-icon-theme
     ripgrep
     zsh
 )
@@ -14,6 +15,7 @@ export pkgs_deps_bluefin=(
     kitty
     neovim
     npm
+    papirus-icon-theme
     quilt
     remmina
 )

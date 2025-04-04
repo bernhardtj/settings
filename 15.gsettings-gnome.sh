@@ -21,9 +21,6 @@ scroll-wheel-emulation-button=2
 [org/gnome/mutter]
 workspaces-only-on-primary=true
 
-[org/gnome/shell]
-enabled-extensions=['settings-main@localhost', 'places-menu@gnome-shell-extensions.gcampax.github.com']
-
 [org/gnome/settings-daemon/plugins/media-keys]
 custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']
 
