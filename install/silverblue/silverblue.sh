@@ -1,5 +1,9 @@
 #!/bin/bash
-
+#
+# bluefin cmd
+# rpt rebase ostree-unverified-registry:ghcr.io/ublue-os/silverblue-main:gts
+#
+#
 get_rpm() {
     curl -sL "$1" | rpm2cpio | cpio -idD /
 }
