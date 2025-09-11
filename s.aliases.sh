@@ -6,6 +6,9 @@ if ! [[ $PATH =~ $HOME/.local/bin:$HOME/bin: ]]; then
 fi
 export PATH
 
+#brew
+[[ -f /home/linuxbrew/.linuxbrew/bin/brew ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
 #conda
 [[ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]] && source "$HOME/anaconda3/etc/profile.d/conda.sh"
 
