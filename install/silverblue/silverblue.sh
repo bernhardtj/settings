@@ -68,4 +68,7 @@ flatpak remote-add --if-not-exists gnome-nightly https://nightly.gnome.org/gnome
 
 flatpak remote-modify --enable flathub
 
+# flatpak install --reinstall -y flathub $(curl https://raw.githubusercontent.com/ublue-os/bluefin/refs/heads/main/flatpaks/system-flatpaks.list) $(curl https://raw.githubusercontent.com/ublue-os/bluefin/refs/heads/main/flatpaks/system-flatpaks-dx.list)
+# brew bundle --file <( curl -fSsL https://raw.githubusercontent.com/ublue-os/bluefin/refs/heads/main/brew/bluefin-ai.Brewfile)
+
 reboot
