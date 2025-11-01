@@ -1,1 +1,25 @@
-flatpak override --env=FLATPAK_ENABLE_SDK_EXT=texlive org.gnu.emacs
+flatpak override --env=FLATPAK_ENABLE_SDK_EXT='*' org.gnu.emacs
+
+NOTE
+
+1.
+Extensions only work if the Sdk from which the extension is derived the SAME as that of the emacs app. There is typically only 1 year version of texlive that works!
+
+flatpak info --show-runtime org.gnu.emacs
+flatpak info --show-runtime org.freedesktop.Sdk.Extension.texlive
+
+2.
+New bug due to pdf2dsc being removed from gs 10.0.5, breaking auctex preview
+
+Successfully fixed (11/1/25) by
+
+brew tap-new gs4/tap
+tgt='/var/home/linuxbrew/.linuxbrew/Homebrew/Library/Taps/gs4/homebrew-tap/Formula/ghostscript.rb'
+curl -o "$tgt" https://raw.githubusercontent.com/Homebrew/homebrew-core/68463b36e07851d7a915f676e7bb2bf934b5173d/Formula/g/ghostscript.rb
+brew install "$tgt"
+
+set custom variables
+ '(preview-gs-command
+   "/home/linuxbrew/.linuxbrew/Cellar/ghostscript/10.04.0/bin/gs")
+ '(preview-pdf2dsc-command
+   "/home/linuxbrew/.linuxbrew/Cellar/ghostscript/10.04.0/bin/pdf2dsc %(O?pdf) %m/preview.dsc")
