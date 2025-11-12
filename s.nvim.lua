@@ -24,6 +24,11 @@ require("lazy").setup({
 		},
 
 		{
+			"github/copilot.vim",
+			lazy = false,
+		},
+
+		{
 			"stevearc/conform.nvim",
 			-- event = 'BufWritePre', -- uncomment for format on save
 			opts = {
@@ -48,23 +53,29 @@ require("lazy").setup({
 				-- load defaults i.e lua_lsp
 				require("nvchad.configs.lspconfig").defaults()
 
-				local lspconfig = require("lspconfig")
+				local nvlsp = require("nvchad.configs.lspconfig")
 
 				-- EXAMPLE
 				local servers = { "html", "cssls", "pyright", "bashls", "rust_analyzer"}
-				local nvlsp = require("nvchad.configs.lspconfig")
 
 				-- lsps with default config
 				for _, lsp in ipairs(servers) do
-					lspconfig[lsp].setup({
+					vim.lsp.config[lsp] = {
+						cmd = vim.lsp.config[lsp].cmd,
+						filetypes = vim.lsp.config[lsp].filetypes,
+						root_markers = vim.lsp.config[lsp].root_markers,
 						on_attach = nvlsp.on_attach,
 						on_init = nvlsp.on_init,
 						capabilities = nvlsp.capabilities,
-					})
+					}
+					vim.lsp.enable(lsp)
 				end
 
-				-- configuring single server, example: typescript
-				lspconfig.texlab.setup({
+				-- configuring single server, example: texlab
+				vim.lsp.config.texlab = {
+					cmd = { "texlab" },
+					filetypes = { "tex", "plaintex", "bib" },
+					root_markers = { ".git", ".latexmkrc" },
 					on_attach = nvlsp.on_attach,
 					on_init = nvlsp.on_init,
 					capabilities = nvlsp.capabilities,
@@ -94,7 +105,8 @@ require("lazy").setup({
 							},
 						},
 					},
-				})
+				}
+				vim.lsp.enable("texlab")
 			end,
 		},
 
