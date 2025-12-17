@@ -6,6 +6,7 @@ export pkgs_deps=(
     neovim
     npm
     papirus-icon-theme
+    breeze-cursor-theme
     ripgrep
     zsh
 )
@@ -23,11 +24,7 @@ export pkgs_deps_bluefin=(
 export pkgs_tools=(
     android-tools
     dnf5-plugins
-    gitk
-    nc
-    nmap
     p7zip-plugins
-    quilt
     ddcutil
 )
 
