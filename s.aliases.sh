@@ -19,7 +19,8 @@ export PATH
 [[ -f "$HOME/.motd" ]] && cat "$HOME/.motd"
 (motd-update >~/.motd &)
 
-export EDITOR=vi
+export EDITOR=nvim
+export VISUAL=nvim
 
 alias :q=exit
 alias q=exit

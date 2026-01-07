@@ -8,6 +8,7 @@
 #
 # NOTE: after running this, handle-lid-switch needs to be changed!
 # $  systemd-analyze cat-config systemd/logind.conf
+# also HibernateDelaySec= in systemd/sleep.conf needs to be set for laptops
 #
 
 set -xe
@@ -24,3 +25,6 @@ sudo swapon --all --verbose
 
 sudo semanage fcontext --add --type swapfile_t $SWAPFILE
 sudo restorecon -RF /var/swap
+
+systemd-analyze cat-config systemd/logind.conf
+systemd-analyze cat-config systemd/sleep.conf

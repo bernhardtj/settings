@@ -24,7 +24,6 @@ export pkgs_deps_bluefin=(
 export pkgs_tools=(
     android-tools
     dnf5-plugins
-    p7zip-plugins
     ddcutil
 )
 
