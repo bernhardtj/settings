@@ -55,6 +55,8 @@ alias lidswitch-inhibit='systemd-inhibit --what=handle-lid-switch bash -c "echo 
 
 dict() { zsh -c 'curl -s "dict.org/${${*//-/}// /:}"' "$@" | sed '/^2/d'; }
 
+office2pdf() { [[ $# -ge 2 ]] && flatpak run org.libreoffice.LibreOffice --headless --convert-to pdf --outdir "$@" || echo >&2 'usage: office2pdf <outdir> <files...>'; }
+
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
