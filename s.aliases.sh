@@ -117,6 +117,17 @@ repo() {
     ~/.local/bin/repo "$@"
 }
 
+rpt_fix_rpmfusion() {
+    sudo bash <<'EOF'
+get_rpm() {
+    curl -sL "$1" | rpm2cpio | cpio -idmuD /
+}
+get_rpm "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
+get_rpm "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+EOF
+    rpm-ostree update --uninstall rpmfusion-free-release --uninstall rpmfusion-nonfree-release --install rpmfusion-free-release --install rpmfusion-nonfree-release
+}
+
 ### Graveyard ###
 
 # colored GCC warnings and errors
