@@ -24,6 +24,7 @@ firefox_roots=(
     "$HOME/.config/mozilla/firefox"
     "$HOME/.var/app/org.mozilla.firefox/.mozilla/firefox"
     "$HOME/.var/app/org.mozilla.firefox/.config/mozilla/firefox"
+    "$HOME/.var/app/org.mozilla.firefox/config/mozilla/firefox"
 )
 
 profile_suffixes=(

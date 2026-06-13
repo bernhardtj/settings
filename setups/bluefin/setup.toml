@@ -13,6 +13,7 @@ targets = []
 [gnome]
 extensions = [
   "settings-updatecheck@localhost",
+  "settings-notification-ticker@localhost"
 ]
 remote_extensions = [
   "panel-workspace-scroll@polymeilex.github.io",

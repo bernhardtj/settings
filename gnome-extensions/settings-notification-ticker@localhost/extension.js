@@ -16,6 +16,7 @@ export default class TickerExtension extends Extension {
     enable() {
         this._timeouts = new Set();
         this._sourceSignals = new Map();
+        this._handledNotifications = new WeakSet();
         this._currentNotification = null;
         this._currentNotificationDestroyId = 0;
 
@@ -63,34 +64,75 @@ export default class TickerExtension extends Extension {
         if (!source || this._sourceSignals.has(source))
             return;
 
+        const originalAddNotification = this._patchSourceAddNotification(source);
         const notificationAddedId = source.connect('notification-added',
-            (_src, notification) => this._onNotificationAdded(notification));
+            (_src, notification) => this._handleNotification(notification));
+        const requestBannerId = source.connect('notification-request-banner',
+            (_src, notification) => this._handleNotification(notification));
 
         const destroyId = source.connect('destroy', () => {
             const ids = this._sourceSignals.get(source);
             if (!ids)
                 return;
+            if (ids.originalAddNotification)
+                source.addNotification = ids.originalAddNotification;
             if (ids.notificationAddedId)
                 source.disconnect(ids.notificationAddedId);
+            if (ids.requestBannerId)
+                source.disconnect(ids.requestBannerId);
             if (ids.destroyId)
                 source.disconnect(ids.destroyId);
             this._sourceSignals.delete(source);
         });
 
-        this._sourceSignals.set(source, {notificationAddedId, destroyId});
+        this._sourceSignals.set(source, {
+            originalAddNotification,
+            notificationAddedId,
+            requestBannerId,
+            destroyId,
+        });
     }
 
-    _onNotificationAdded(notification) {
-        const summary = `${notification?.summary ?? ''}`.trim();
-        const body = `${notification?.bannerBodyText ?? notification?.body ?? ''}`.trim();
-        const message = `${summary ? `${summary}: ` : ''}${body}`.trim();
+    _patchSourceAddNotification(source) {
+        if (typeof source.addNotification !== 'function')
+            return null;
 
+        const originalAddNotification = source.addNotification;
+        const extension = this;
+
+        source.addNotification = function (notification) {
+            extension._handleNotification(notification);
+            return originalAddNotification.call(this, notification);
+        };
+
+        return originalAddNotification;
+    }
+
+    _handleNotification(notification) {
+        if (!notification || this._handledNotifications.has(notification))
+            return;
+
+        this._handledNotifications.add(notification);
+
+        const message = this._notificationMessage(notification);
         if (!message)
             return;
 
         this._suppressNativeBanner(notification);
         this._setCurrentNotification(notification);
         this._showTicker(message);
+    }
+
+    _notificationMessage(notification) {
+        const summary = `${notification.title ?? notification.summary ?? ''}`.trim();
+        const body = `${
+            notification.bannerBodyText ??
+            notification.body ??
+            notification.bannerBody ??
+            ''
+        }`.trim();
+
+        return `${summary ? `${summary}: ` : ''}${body}`.trim();
     }
 
     _suppressNativeBanner(notification) {
@@ -243,8 +285,12 @@ export default class TickerExtension extends Extension {
             Main.messageTray.disconnect(this._sourceAddedId);
 
         for (const [source, ids] of this._sourceSignals) {
+            if (ids.originalAddNotification)
+                source.addNotification = ids.originalAddNotification;
             if (ids.notificationAddedId)
                 source.disconnect(ids.notificationAddedId);
+            if (ids.requestBannerId)
+                source.disconnect(ids.requestBannerId);
             if (ids.destroyId)
                 source.disconnect(ids.destroyId);
         }
@@ -254,6 +300,7 @@ export default class TickerExtension extends Extension {
         this._button = null;
         this._container = null;
         this._tickerLabel = null;
+        this._handledNotifications = null;
         this._currentNotificationDestroyId = 0;
         this._currentNotification = null;
     }
