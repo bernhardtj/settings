@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+usage() {
+    cat <<'EOF'
+usage: settings <command> [args]
+
+commands:
+    list                 List setups
+    lineage [setup]      Print setup inheritance
+    plan [setup]         Print apply plan JSON
+    apply [setup]        Apply setup dotfiles
+    validate [setup]     Validate setup metadata and files
+    install [setup]      Run install actions and hooks
+    software ...         Manage on-demand software
+EOF
+}
+
+command="${1:-}"
+[[ $# -gt 0 ]] && shift || true
+
+case "$command" in
+list)
+    "$repo_root/bin/settings-setup" list "$@"
+    ;;
+lineage)
+    "$repo_root/bin/settings-setup" lineage "$@"
+    ;;
+plan)
+    "$repo_root/bin/settings-apply" --plan "$@"
+    ;;
+apply)
+    "$repo_root/bin/settings-apply" "$@"
+    ;;
+validate)
+    "$repo_root/bin/settings-setup" validate "$@"
+    ;;
+install)
+    "$repo_root/bin/settings-install" "$@"
+    ;;
+software)
+    "$repo_root/bin/settings-software" "$@"
+    ;;
+"" | -h | --help | help)
+    usage
+    ;;
+*)
+    echo "settings: unknown command: $command" >&2
+    usage >&2
+    exit 1
+    ;;
+esac

@@ -1,0 +1,6 @@
+{
+  "uuid": "settings-clock@localhost",
+  "name": "Settings Clock",
+  "description": "Legacy GNOME Shell clock display tweak migrated from the old misc folder.",
+  "shell-version": ["3.36", "3.38", "40", "41", "42"]
+}

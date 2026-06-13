@@ -1,0 +1,11 @@
+description = "Core packages for Bluefin-derived setups."
+providers = ["dnf", "rpm-ostree"]
+packages = [
+  "fira-code-fonts",
+  "kitty",
+  "papirus-icon-theme",
+  "breeze-cursor-theme"
+]
+remove = []
+flatpaks = []
+kargs = []

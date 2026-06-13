@@ -1,0 +1,6 @@
+{
+  "uuid": "settings-main@localhost",
+  "name": "Settings Main",
+  "description": "GNOME Shell tweaks managed by this settings repository.",
+  "shell-version": ["45", "46", "47", "48", "49", "50"]
+}

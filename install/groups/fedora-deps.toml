@@ -1,0 +1,15 @@
+description = "Core Fedora user packages used by the migrated dotfiles."
+providers = ["dnf", "rpm-ostree"]
+packages = [
+  "fira-code-fonts",
+  "kitty",
+  "neovim",
+  "npm",
+  "papirus-icon-theme",
+  "breeze-cursor-theme",
+  "ripgrep",
+  "zsh",
+]
+remove = []
+flatpaks = []
+kargs = []

@@ -1,0 +1,11 @@
+name = "default"
+description = "Migrated legacy dotfiles setup"
+inherits = []
+
+[install]
+groups = []
+actions = []
+
+[software]
+shims = true
+targets = []

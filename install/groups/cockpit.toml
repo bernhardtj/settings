@@ -1,0 +1,21 @@
+description = "Cockpit packages for local system administration."
+providers = ["dnf", "rpm-ostree"]
+packages = [
+  "cockpit",
+  "cockpit-composer",
+  "cockpit-file-sharing",
+  "cockpit-kdump",
+  "cockpit-machines",
+  "cockpit-navigator",
+  "cockpit-networkmanager",
+  "cockpit-ostree",
+  "cockpit-packagekit",
+  "cockpit-podman",
+  "cockpit-selinux",
+  "cockpit-session-recording",
+  "cockpit-sosreport",
+  "cockpit-storaged",
+]
+remove = []
+flatpaks = []
+kargs = []

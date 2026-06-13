@@ -1,0 +1,11 @@
+name = "mate-i3"
+description = "MATE and i3 desktop setup"
+inherits = ["default"]
+
+[install]
+groups = ["fedora-deps"]
+actions = []
+
+[software]
+shims = true
+targets = []

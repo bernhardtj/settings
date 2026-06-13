@@ -1,0 +1,11 @@
+name = "gnome"
+description = "GNOME desktop setup shared by Silverblue and Bluefin"
+inherits = ["default"]
+
+[install]
+groups = []
+actions = []
+
+[software]
+shims = true
+targets = []

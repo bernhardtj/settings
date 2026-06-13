@@ -1,0 +1,10 @@
+description = "Small system tools useful on Fedora workstation setups."
+providers = ["dnf", "rpm-ostree"]
+packages = [
+  "android-tools",
+  "dnf5-plugins",
+  "ddcutil",
+]
+remove = []
+flatpaks = []
+kargs = []

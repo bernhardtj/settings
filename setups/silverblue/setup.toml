@@ -1,0 +1,11 @@
+name = "silverblue"
+description = "Fedora Silverblue GNOME setup"
+inherits = ["gnome"]
+
+[install]
+groups = ["fedora-tools", "silverblue-cleanup", "openh264"]
+actions = ["enable-rpmfusion", "enable-flathub", "rpm-ostree-auto-updates", "set-zsh-shell"]
+
+[software]
+shims = true
+targets = []

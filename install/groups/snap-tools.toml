@@ -1,0 +1,9 @@
+description = "Example Snap-managed tools."
+providers = ["snap"]
+packages = []
+classic = [
+  "code",
+]
+remove = []
+flatpaks = []
+kargs = []

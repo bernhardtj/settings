@@ -1,0 +1,6 @@
+{
+  "uuid": "settings-updatecheck@localhost",
+  "name": "Settings Update Check",
+  "description": "Shows an rpm-ostree staged-update indicator in GNOME Shell.",
+  "shell-version": ["45", "46", "47", "48", "49", "50"]
+}

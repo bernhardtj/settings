@@ -1,0 +1,9 @@
+# .config/picom/picom.conf
+fading = true;
+# fade-delta = 30;
+fade-in-step = 0.06;
+fade-out-step = 0.06;
+# no-fading-openclose = true;
+# no-fading-destroyed-argb = true;
+fade-exclude = [ ];
+

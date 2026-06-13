@@ -1,0 +1,256 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_path="$(realpath "${BASH_SOURCE[0]}")"
+repo_root="$(cd "$(dirname "$script_path")/.." && pwd)"
+software_recipes_dir="${SETTINGS_SOFTWARE_RECIPES_DIR:-$repo_root/software/recipes}"
+state_dir="${SETTINGS_STATE_DIR:-$repo_root/.state}"
+
+source "$repo_root/lib/software.sh"
+
+usage() {
+    cat <<'EOF'
+usage: settings-software <command> [target]
+
+commands:
+    list                  List available software shims
+    setup-shims           Create on-demand shims in ~/.local/bin
+    install <target>      Install a target by recipe
+    recipe <target>       Print the target install function
+    update-installed      Reinstall targets recorded in state
+
+legacy aliases:
+    --setup
+    --install <target>
+    --recipe <target>
+EOF
+}
+
+recipe_files() {
+    find "$software_recipes_dir" -maxdepth 1 -type f -name '*.sh' | sort
+}
+
+load_recipe() {
+    unset -f recipe_bin recipe_install
+    source "$1"
+}
+
+recipe_bins() {
+    local recipe="$1"
+    load_recipe "$recipe"
+    recipe_bin
+}
+
+find_recipe_for_bin() {
+    local target="$1"
+    local recipe
+    local link
+    while IFS= read -r recipe; do
+        while IFS= read -r link; do
+            if [[ $link == "$target" ]]; then
+                echo "$recipe"
+                return 0
+            fi
+        done < <(recipe_bins "$recipe")
+    done < <(recipe_files)
+    return 1
+}
+
+list_targets() {
+    local recipe
+    while IFS= read -r recipe; do
+        recipe_bins "$recipe"
+    done < <(recipe_files) | sort -u
+}
+
+record_installed() {
+    local target="$1"
+    local installed="$state_dir/software/installed"
+    mkdir -p "$(dirname "$installed")"
+    touch "$installed"
+    if ! grep -qxF "$target" "$installed"; then
+        echo "$target" >>"$installed"
+    fi
+}
+
+network_available() {
+    if [[ ${SETTINGS_SOFTWARE_ASSUME_ONLINE:-} == 1 || ${SETTINGS_SOFTWARE_ASSUME_ONLINE:-} == true ]]; then
+        return 0
+    fi
+    if command -v nm-online >/dev/null 2>&1; then
+        nm-online -qx
+    else
+        return 0
+    fi
+}
+
+install_target() {
+    local target="$1"
+    local recipe
+    recipe="$(find_recipe_for_bin "$target")" || {
+        echo "settings-software: no recipe found for $target" >&2
+        return 1
+    }
+
+    if ! network_available; then
+        echo "settings-software: offline; doing nothing." >&2
+        return 1
+    fi
+
+    load_recipe "$recipe"
+    local bin
+    while IFS= read -r bin; do
+        rm -f "$HOME/.local/bin/$bin"
+    done < <(recipe_bin)
+
+    mkdir -p "$HOME/.local/bin"
+    pushd "$(mktemp -d)" >/dev/null
+    recipe_install
+    popd >/dev/null
+    chmod -R u+rwX,go+rX "$HOME/.local/bin" 2>/dev/null || true
+    record_installed "$target"
+}
+
+setup_shims() {
+    local self="$script_path"
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$self" "$HOME/.local/bin/software-update"
+    local target
+    while IFS= read -r target; do
+        install_shim "$target" "$self"
+    done < <(list_targets)
+}
+
+install_shim() {
+    local target="$1"
+    local self="$2"
+    local link="$HOME/.local/bin/$target"
+    local current=""
+
+    if [[ -L $link ]]; then
+        current="$(realpath "$link" 2>/dev/null || true)"
+        case "$(basename "$current")" in
+        settings-software | software-mono.sh | software-update | "")
+            ln -sfn "$self" "$link"
+            return
+            ;;
+        esac
+    fi
+
+    if [[ ! -e $link ]]; then
+        ln -sf "$self" "$link"
+    fi
+}
+
+show_recipe() {
+    local target="$1"
+    local recipe
+    recipe="$(find_recipe_for_bin "$target")" || {
+        echo "settings-software: no recipe found for $target" >&2
+        return 1
+    }
+    load_recipe "$recipe"
+    declare -f recipe_install
+}
+
+update_installed() {
+    local installed="$state_dir/software/installed"
+    [[ -f $installed ]] || return 0
+    local target
+    while IFS= read -r target; do
+        [[ -n $target ]] || continue
+        install_target "$target"
+    done <"$installed"
+}
+
+shim_entrypoint() {
+    local invoked
+    invoked="$(basename "$0")"
+    case "$invoked" in
+    settings-software | software-update)
+        return 2
+        ;;
+    esac
+    install_target "$invoked" || return $?
+    exec_installed "$invoked" "$@"
+}
+
+exec_installed() {
+    local invoked="$1"
+    shift
+    local installed="$HOME/.local/bin/$invoked"
+    local resolved=""
+
+    if [[ -x $installed ]]; then
+        resolved="$(realpath "$installed" 2>/dev/null || true)"
+        if [[ $resolved != "$script_path" ]]; then
+            exec "$installed" "$@"
+        fi
+    fi
+
+    hash -r
+    installed="$(command -v "$invoked" || true)"
+    if [[ -n $installed ]]; then
+        resolved="$(realpath "$installed" 2>/dev/null || true)"
+        if [[ $resolved != "$script_path" ]]; then
+            exec "$installed" "$@"
+        fi
+    fi
+
+    echo "settings-software: $invoked installed, but no executable was found" >&2
+    return 1
+}
+
+main() {
+    local shim_status=0
+    shim_entrypoint "$@" || shim_status=$?
+    case "$shim_status" in
+    0)
+        return 0
+        ;;
+    2)
+        ;;
+    *)
+        return "$shim_status"
+        ;;
+    esac
+
+    local command="${1:-}"
+    [[ $# -gt 0 ]] && shift || true
+
+    case "$command" in
+    list)
+        list_targets
+        ;;
+    setup-shims | --setup)
+        setup_shims
+        ;;
+    install | --install)
+        [[ ${1:-} ]] || {
+            usage >&2
+            return 1
+        }
+        install_target "$1"
+        ;;
+    recipe | --recipe)
+        [[ ${1:-} ]] || {
+            usage >&2
+            return 1
+        }
+        show_recipe "$1"
+        ;;
+    update-installed)
+        update_installed
+        ;;
+    -h | --help | help | "")
+        usage
+        ;;
+    *)
+        echo "settings-software: unknown command: $command" >&2
+        usage >&2
+        return 1
+        ;;
+    esac
+}
+
+main "$@"

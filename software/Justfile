@@ -1,0 +1,21 @@
+set shell := ["bash", "-c"]
+
+# List available software targets.
+list:
+    ../bin/settings-software list
+
+# Install or update one software target.
+install target:
+    ../bin/settings-software install {{target}}
+
+# Show the install function for a target.
+recipe target:
+    ../bin/settings-software recipe {{target}}
+
+# Create ~/.local/bin shims for all recipe-provided targets.
+setup-shims:
+    ../bin/settings-software setup-shims
+
+# Reinstall software targets recorded in state.
+update-installed:
+    ../bin/settings-software update-installed

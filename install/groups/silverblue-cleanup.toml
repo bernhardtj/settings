@@ -1,0 +1,10 @@
+description = "Base packages commonly removed from Silverblue-style systems."
+providers = ["rpm-ostree"]
+packages = []
+remove = [
+  "ptyxis",
+  "gnome-tour",
+  "yelp",
+]
+flatpaks = []
+kargs = []

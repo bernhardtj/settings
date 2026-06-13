@@ -1,0 +1,20 @@
+name = "bluefin"
+description = "Bluefin GNOME workstation setup"
+inherits = ["gnome"]
+
+[install]
+groups = ["bluefin-deps", "bluefin-brew"]
+actions = ["enable-hibernation"]
+
+[software]
+shims = true
+targets = []
+
+[gnome]
+extensions = [
+  "settings-updatecheck@localhost",
+]
+remote_extensions = [
+  "panel-workspace-scroll@polymeilex.github.io",
+  "status-icons@gnome-shell-extensions.gcampax.github.com",
+]

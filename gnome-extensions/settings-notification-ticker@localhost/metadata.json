@@ -1,0 +1,6 @@
+{
+  "uuid": "settings-notification-ticker@localhost",
+  "name": "Settings Notification Ticker",
+  "description": "Shows recent notifications as a ticker in the GNOME Shell panel.",
+  "shell-version": ["45", "46", "47", "48", "49", "50"]
+}

@@ -1,0 +1,11 @@
+description = "OpenH264 replacement packages for rpm-ostree systems."
+providers = ["rpm-ostree"]
+packages = [
+  "openh264",
+  "mozilla-openh264",
+]
+remove = [
+  "noopenh264",
+]
+flatpaks = []
+kargs = []

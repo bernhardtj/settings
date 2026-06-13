@@ -1,0 +1,11 @@
+name = "hyprland"
+description = "Hyprland desktop setup"
+inherits = ["default"]
+
+[install]
+groups = ["fedora-deps"]
+actions = []
+
+[software]
+shims = true
+targets = []

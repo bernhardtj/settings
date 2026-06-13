@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "lib"))
+
+from settings_core import SettingsError, run_install
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Run install actions for a setup.")
+    parser.add_argument("setup", nargs="?", default="default")
+    parser.add_argument("target", nargs="?", default="all")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--provider",
+        choices=("auto", "dnf", "rpm-ostree", "brew", "snap"),
+        default="auto",
+        help="package provider for install groups",
+    )
+    args = parser.parse_args()
+
+    try:
+        run_install(args.setup, args.target, args.dry_run, args.provider)
+    except SettingsError as exc:
+        print(f"settings-install: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "lib"))
+
+from settings_core import SettingsError, apply_settings, plan_json
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Apply a settings setup.")
+    parser.add_argument("setup", nargs="?", default="default")
+    parser.add_argument("--plan", action="store_true", help="print the resolved apply plan as JSON")
+    parser.add_argument("--no-scripts", action="store_true", help="apply settings without lifecycle scripts")
+    parser.add_argument("--home", type=Path, help="override HOME for tests or staging")
+    parser.add_argument("--state-dir", type=Path, help="override generated state directory")
+    args = parser.parse_args()
+
+    try:
+        if args.plan:
+            print(plan_json(args.setup))
+        else:
+            apply_settings(
+                args.setup,
+                run_scripts=not args.no_scripts,
+                home=args.home,
+                state_dir=args.state_dir,
+            )
+    except SettingsError as exc:
+        print(f"settings-apply: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

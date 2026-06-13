@@ -1,0 +1,12 @@
+description = "Docker CE packages."
+providers = ["dnf", "rpm-ostree"]
+packages = [
+  "docker-ce",
+  "docker-ce-cli",
+  "containerd.io",
+  "docker-buildx-plugin",
+  "docker-compose-plugin",
+]
+remove = []
+flatpaks = []
+kargs = []

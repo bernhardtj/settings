@@ -1,0 +1,12 @@
+description = "RPM development and build tooling."
+providers = ["dnf", "rpm-ostree"]
+packages = [
+  "createrepo_c",
+  "rpm-build",
+  "rpm-devel",
+  "rpmdevtools",
+  "rpmlint",
+]
+remove = []
+flatpaks = []
+kargs = []

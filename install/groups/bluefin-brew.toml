@@ -1,0 +1,9 @@
+description = "Core packages for Bluefin-derived setups."
+providers = ["brew"]
+packages = [
+  "neovim",
+  "npm",
+]
+remove = []
+flatpaks = []
+kargs = []

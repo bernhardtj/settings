@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.settings" path="/org/gnome/shell/extensions/settings/">
+    <key type="as" name="flop-left">
+      <default><![CDATA[['<Super>b']]]></default>
+    </key>
+    <key type="as" name="flop-right">
+      <default><![CDATA[['<Super>f']]]></default>
+    </key>
+  </schema>
+</schemalist>
