@@ -89,6 +89,12 @@ apply setup="default":
 apply-settings-only setup="default":
     bin/settings-apply {{setup}} --no-scripts
 
+save setup="default":
+    bin/settings-save {{setup}}
+
+save-dry setup="default":
+    bin/settings-save {{setup}} --dry-run
+
 install setup="default" group="all":
     bin/settings install {{setup}} {{group}}
 
@@ -323,9 +329,22 @@ remote_extensions = [
 During `settings apply`, the apply engine runs
 `apply/actions/gnome-extensions.sh` after pre-scripts. The action copies bundled
 extensions into `~/.local/share/gnome-shell/extensions/`, compiles schemas when
-present, installs missing remote extensions, resets the user-extension disable
-flag, and enables the selected UUIDs. This keeps extension source out of setup
-dotfile folders while keeping extension selection in setup metadata.
+present, installs and verifies missing remote extensions, and treats the
+resolved setup selection as the exact enabled-extension set. Installed
+extensions that are not selected remain installed but are disabled, including
+system extensions. An empty selection on a GNOME-derived setup disables all
+optional extensions. Apply fails when a selected UUID cannot be installed or
+enabled. This keeps extension source out of setup dotfile folders while keeping
+extension selection in setup metadata.
+
+`just save <setup>` performs the reverse workflow for deliberate imperative
+edits. It reads each resolved dotfile from its installed home path and writes
+changed content back to the owning `s.*` file while preserving removable target
+markers. For GNOME-derived setups, it also records the currently enabled
+extensions in the selected setup's `[gnome]` section; repository-bundled UUIDs
+go to `extensions`, while all other enabled UUIDs go to `remote_extensions`.
+The command only creates working-tree edits for review and does not commit.
+`just save-dry <setup>` previews the same capture without writing files.
 
 ## Inheritance Model
 

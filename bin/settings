@@ -12,6 +12,7 @@ commands:
     lineage [setup]      Print setup inheritance
     plan [setup]         Print apply plan JSON
     apply [setup]        Apply setup dotfiles
+    save [setup]         Save installed edits into a setup
     validate [setup]     Validate setup metadata and files
     install [setup]      Run install actions and hooks
     software ...         Manage on-demand software
@@ -33,6 +34,9 @@ plan)
     ;;
 apply)
     "$repo_root/bin/settings-apply" "$@"
+    ;;
+save)
+    "$repo_root/bin/settings-save" "$@"
     ;;
 validate)
     "$repo_root/bin/settings-setup" validate "$@"

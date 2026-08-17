@@ -9,9 +9,12 @@ from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
 import sys
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "lib"))
+
+import settings_core
 
 from settings_core import (
     apply_settings,
@@ -47,6 +50,22 @@ class SettingsCoreTests(unittest.TestCase):
             "panel-workspace-scroll@polymeilex.github.io",
             plan["gnome"]["remote_extensions"],
         )
+
+    def test_empty_gnome_selection_still_runs_extension_reconciliation(self) -> None:
+        plan = build_plan("gnome")
+        self.assertEqual(plan["gnome"]["extensions"], [])
+        self.assertEqual(plan["gnome"]["remote_extensions"], [])
+
+        with redirect_stdout(StringIO()):
+            with patch.object(settings_core.subprocess, "check_call") as check_call:
+                settings_core._run_gnome_extensions_action(plan, Path("/tmp/test-home"))
+
+        argv = check_call.call_args.args[0]
+        env = check_call.call_args.kwargs["env"]
+        self.assertEqual(argv[0], "bash")
+        self.assertEqual(env["SETTINGS_GNOME_EXTENSIONS"], "")
+        self.assertEqual(env["SETTINGS_GNOME_REMOTE_EXTENSIONS"], "")
+        self.assertEqual(env["SETTINGS_GNOME_EXTENSIONS_FORCE"], "1")
 
     def test_group_metadata_loads_packages(self) -> None:
         group = load_group("fedora-deps")
@@ -109,6 +128,69 @@ class SettingsCoreTests(unittest.TestCase):
             parsed = parse_setting(path, "fixture")
             self.assertEqual(parsed["target"], ".example")
             self.assertTrue(parsed["strip_first_line"])
+
+    def test_saved_setting_content_preserves_plain_target_marker(self) -> None:
+        setting = {"path": "setups/default/s.example", "strip_first_line": True}
+        saved = settings_core._saved_setting_bytes(
+            setting,
+            b".example\nold value\n",
+            b"new value\n",
+        )
+        self.assertEqual(saved, b".example\nnew value\n")
+
+    def test_save_plan_reads_installed_symlink_content(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            home = Path(tmp) / "home"
+            source = root / "setups/default/s.example"
+            installed = Path(tmp) / "state/s.example"
+            source.parent.mkdir(parents=True)
+            installed.parent.mkdir(parents=True)
+            home.mkdir()
+            source.write_text(".example\nold value\n")
+            installed.write_text("imperative edit\n")
+            (home / ".example").symlink_to(installed)
+            plan = {
+                "settings": [
+                    {
+                        "path": "setups/default/s.example",
+                        "target": ".example",
+                        "strip_first_line": True,
+                    }
+                ]
+            }
+
+            saves = settings_core._plan_dotfile_saves(plan, home, root)
+
+            self.assertEqual(len(saves), 1)
+            self.assertTrue(saves[0]["changed"])
+            self.assertEqual(saves[0]["content"], b".example\nimperative edit\n")
+
+    def test_gnome_selection_update_replaces_arrays_and_preserves_other_metadata(self) -> None:
+        original = """name = "fixture"
+
+[gnome]
+extensions = ["old@localhost"]
+remote_extensions = [
+  "old@example",
+]
+
+[software]
+shims = true
+"""
+        updated = settings_core._updated_gnome_selection(
+            original,
+            ["local@localhost"],
+            ["remote@example", "system@example"],
+        )
+        parsed = settings_core.tomllib.loads(updated)
+
+        self.assertEqual(parsed["gnome"]["extensions"], ["local@localhost"])
+        self.assertEqual(
+            parsed["gnome"]["remote_extensions"],
+            ["remote@example", "system@example"],
+        )
+        self.assertTrue(parsed["software"]["shims"])
 
     def test_apply_writes_locks_and_symlinks_in_fake_home(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -176,14 +258,18 @@ class SettingsCoreTests(unittest.TestCase):
             self.assertTrue((installed / "extension.js").exists())
             self.assertTrue((installed / "stylesheet.css").exists())
 
-    def test_gnome_extension_action_bootstraps_and_tolerates_enable_failure(self) -> None:
+    def test_gnome_extension_action_installs_remote_and_enforces_exact_enabled_set(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             home = root / "home"
             fakebin = root / "bin"
             log = root / "gnome-extensions.log"
+            installed_state = root / "installed"
+            enabled_state = root / "enabled"
             home.mkdir()
             fakebin.mkdir()
+            installed_state.write_text("extra@example\n")
+            enabled_state.write_text("extra@example\n")
             fake_command = fakebin / "gnome-extensions"
             fake_command.write_text(
                 """#!/usr/bin/env bash
@@ -198,18 +284,35 @@ case "$1" in
         mkdir -p "$HOME/.local/share/gnome-shell/extensions/$uuid"
         ;;
     list)
-        if [[ ${2:-} != "--enabled" ]]; then
-            printf 'settings-main@localhost\\n'
+        if [[ ${2:-} == "--enabled" ]]; then
+            cat "$GNOME_EXTENSIONS_ENABLED_STATE"
+        else
+            cat "$GNOME_EXTENSIONS_INSTALLED_STATE"
         fi
-        exit 0
         ;;
     enable)
-        exit 2
+        grep -Fxq "$2" "$GNOME_EXTENSIONS_ENABLED_STATE" ||
+            printf '%s\\n' "$2" >>"$GNOME_EXTENSIONS_ENABLED_STATE"
+        ;;
+    disable)
+        grep -Fxv "$2" "$GNOME_EXTENSIONS_ENABLED_STATE" >"$GNOME_EXTENSIONS_ENABLED_STATE.tmp" || true
+        mv "$GNOME_EXTENSIONS_ENABLED_STATE.tmp" "$GNOME_EXTENSIONS_ENABLED_STATE"
         ;;
 esac
 """
             )
             fake_command.chmod(0o755)
+            fake_busctl = fakebin / "busctl"
+            fake_busctl.write_text(
+                """#!/usr/bin/env bash
+printf 'busctl %s\\n' "$*" >>"$GNOME_EXTENSIONS_FAKE_LOG"
+uuid="${@: -1}"
+grep -Fxq "$uuid" "$GNOME_EXTENSIONS_INSTALLED_STATE" ||
+    printf '%s\\n' "$uuid" >>"$GNOME_EXTENSIONS_INSTALLED_STATE"
+printf 's "successful"\\n'
+"""
+            )
+            fake_busctl.chmod(0o755)
 
             env = os.environ.copy()
             env.update(
@@ -217,8 +320,10 @@ esac
                     "HOME": str(home),
                     "PATH": f"{fakebin}:{env.get('PATH', '')}",
                     "GNOME_EXTENSIONS_FAKE_LOG": str(log),
+                    "GNOME_EXTENSIONS_INSTALLED_STATE": str(installed_state),
+                    "GNOME_EXTENSIONS_ENABLED_STATE": str(enabled_state),
                     "SETTINGS_GNOME_EXTENSIONS": "settings-main@localhost",
-                    "SETTINGS_GNOME_REMOTE_EXTENSIONS": "",
+                    "SETTINGS_GNOME_REMOTE_EXTENSIONS": "remote@example",
                     "SETTINGS_GNOME_EXTENSIONS_FORCE": "1",
                     "SETTINGS_GNOME_EXTENSIONS_ENABLE": "1",
                     "SETTINGS_GNOME_EXTENSIONS_GSETTINGS": "0",
@@ -233,8 +338,18 @@ esac
 
             installed = home / ".local/share/gnome-shell/extensions/settings-main@localhost"
             self.assertTrue((installed / "metadata.json").exists())
-            self.assertIn("create", log.read_text())
-            self.assertIn("enable settings-main@localhost", log.read_text())
+            command_log = log.read_text()
+            self.assertIn("create", command_log)
+            self.assertIn("busctl", command_log)
+            self.assertIn("ReloadExtension", command_log)
+            self.assertIn("remote@example", command_log)
+            self.assertIn("enable settings-main@localhost", command_log)
+            self.assertIn("enable remote@example", command_log)
+            self.assertIn("disable extra@example", command_log)
+            self.assertEqual(
+                enabled_state.read_text().splitlines(),
+                ["settings-main@localhost", "remote@example"],
+            )
 
     def test_bundled_gnome_extension_metadata_matches_directory(self) -> None:
         metadata_files = sorted((ROOT / "gnome-extensions").glob("*/metadata.json"))

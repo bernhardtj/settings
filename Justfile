@@ -16,6 +16,14 @@ plan setup="default":
 apply setup="default":
     bin/settings-apply {{setup}}
 
+# Save installed dotfile edits and enabled GNOME extensions into a setup.
+save setup="default":
+    bin/settings-save {{setup}}
+
+# Preview installed dotfile and GNOME extension changes without writing.
+save-dry setup="default":
+    bin/settings-save {{setup}} --dry-run
+
 # Run install groups, actions, and hooks for a setup.
 install setup="default" group="all":
     bin/settings install {{setup}} {{group}}

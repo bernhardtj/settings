@@ -500,7 +500,7 @@ def _run_script(script: dict[str, Any]) -> None:
 def _run_gnome_extensions_action(plan: dict[str, Any], home: Path) -> None:
     extensions = plan["gnome"]["extensions"]
     remote_extensions = plan["gnome"]["remote_extensions"]
-    if not extensions and not remote_extensions:
+    if "gnome" not in plan["lineage"] and not extensions and not remote_extensions:
         return
     path = _apply_action_path("gnome-extensions")
     if not path.exists():
@@ -510,8 +510,216 @@ def _run_gnome_extensions_action(plan: dict[str, Any], home: Path) -> None:
     env["HOME"] = str(home)
     env["SETTINGS_GNOME_EXTENSIONS"] = "\n".join(extensions)
     env["SETTINGS_GNOME_REMOTE_EXTENSIONS"] = "\n".join(remote_extensions)
+    env["SETTINGS_GNOME_EXTENSIONS_FORCE"] = "1"
     print("-> applying gnome extensions")
     subprocess.check_call(["bash", str(path)], env=env)
+
+
+def _saved_setting_bytes(setting: dict[str, Any], source: bytes, installed: bytes) -> bytes:
+    if not setting["strip_first_line"]:
+        return installed
+
+    marker_lines = source.splitlines(keepends=True)
+    if not marker_lines:
+        raise SettingsError(f"setting has no target marker: {setting['path']}")
+    marker = marker_lines[0]
+    if not marker.endswith((b"\n", b"\r")):
+        marker += b"\n"
+    return marker + installed
+
+
+def _plan_dotfile_saves(
+    plan: dict[str, Any],
+    home: Path,
+    root: Path = ROOT,
+) -> list[dict[str, Any]]:
+    saves: list[dict[str, Any]] = []
+    missing: list[str] = []
+
+    for setting in plan["settings"]:
+        source = root / setting["path"]
+        target = home / setting["target"]
+        if not target.exists() or not target.is_file():
+            missing.append(f"~/{setting['target']}")
+            continue
+
+        source_bytes = source.read_bytes()
+        saved_bytes = _saved_setting_bytes(setting, source_bytes, target.read_bytes())
+        saves.append(
+            {
+                "source": source,
+                "target": target,
+                "display_source": setting["path"],
+                "display_target": f"~/{setting['target']}",
+                "content": saved_bytes,
+                "changed": saved_bytes != source_bytes,
+            }
+        )
+
+    if missing:
+        raise SettingsError("installed settings are missing: " + ", ".join(missing))
+    return saves
+
+
+def _enabled_gnome_extensions() -> list[str]:
+    if shutil.which("gnome-extensions") is None:
+        raise SettingsError("gnome-extensions command is required to save extension state")
+
+    result = subprocess.run(
+        ["gnome-extensions", "list", "--enabled"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        detail = result.stderr.strip() or f"exit status {result.returncode}"
+        raise SettingsError(f"could not read enabled GNOME extensions: {detail}")
+    return list(dict.fromkeys(line.strip() for line in result.stdout.splitlines() if line.strip()))
+
+
+def _format_toml_array(key: str, values: list[str]) -> list[str]:
+    if not values:
+        return [f"{key} = []"]
+    return [
+        f"{key} = [",
+        *(f"  {json.dumps(value, ensure_ascii=False)}," for value in values),
+        "]",
+    ]
+
+
+def _toml_assignment_end(lines: list[str], start: int) -> int:
+    _, _, value = lines[start].partition("=")
+    balance = value.count("[") - value.count("]")
+    index = start + 1
+    while balance > 0 and index < len(lines):
+        balance += lines[index].count("[") - lines[index].count("]")
+        index += 1
+    return index
+
+
+def _updated_gnome_selection(
+    text: str,
+    bundled: list[str],
+    remote: list[str],
+) -> str:
+    lines = text.splitlines()
+    section_start: int | None = None
+    section_end = len(lines)
+
+    for index, line in enumerate(lines):
+        match = re.match(r"^\s*\[([^]]+)]\s*(?:#.*)?$", line)
+        if not match:
+            continue
+        if match.group(1).strip() == "gnome":
+            section_start = index
+            continue
+        if section_start is not None:
+            section_end = index
+            break
+
+    if section_start is None:
+        if lines and lines[-1].strip():
+            lines.append("")
+        lines.append("[gnome]")
+        section_start = len(lines) - 1
+        section_end = len(lines)
+
+    body = lines[section_start + 1 : section_end]
+    preserved: list[str] = []
+    insertion_index: int | None = None
+    index = 0
+    while index < len(body):
+        match = re.match(r"^\s*(extensions|remote_extensions)\s*=", body[index])
+        if not match:
+            preserved.append(body[index])
+            index += 1
+            continue
+        if insertion_index is None:
+            insertion_index = len(preserved)
+        index = _toml_assignment_end(body, index)
+
+    if insertion_index is None:
+        while preserved and not preserved[-1].strip():
+            preserved.pop()
+        insertion_index = len(preserved)
+
+    selection = [
+        *_format_toml_array("extensions", bundled),
+        *_format_toml_array("remote_extensions", remote),
+    ]
+    updated_body = [
+        *preserved[:insertion_index],
+        *selection,
+        *preserved[insertion_index:],
+    ]
+    lines[section_start + 1 : section_end] = updated_body
+    updated = "\n".join(lines) + "\n"
+
+    if tomllib is not None:
+        try:
+            tomllib.loads(updated)
+        except tomllib.TOMLDecodeError as exc:
+            raise SettingsError(f"generated setup metadata is invalid TOML: {exc}") from exc
+    return updated
+
+
+def save_settings(
+    name: str,
+    home: Path | None = None,
+    enabled_extensions: list[str] | None = None,
+    dry_run: bool = False,
+) -> None:
+    plan = build_plan(name)
+    if home is None:
+        home = Path(os.environ.get("HOME", str(Path.home())))
+
+    dotfile_saves = _plan_dotfile_saves(plan, home)
+    setup_metadata_path: Path | None = None
+    setup_metadata_text: str | None = None
+    metadata_changed = False
+
+    if "gnome" in plan["lineage"]:
+        if enabled_extensions is None:
+            enabled_extensions = _enabled_gnome_extensions()
+        enabled_extensions = list(dict.fromkeys(enabled_extensions))
+        bundled = [
+            uuid for uuid in enabled_extensions if (ROOT / "gnome-extensions" / uuid).is_dir()
+        ]
+        remote = [uuid for uuid in enabled_extensions if uuid not in bundled]
+        setup_metadata_path = setup_dir(name) / "setup.toml"
+        original_metadata = setup_metadata_path.read_text()
+        current_metadata = load_toml(setup_metadata_path)
+        current_gnome = current_metadata.get("gnome", {})
+        if (
+            current_gnome.get("extensions", []) == bundled
+            and current_gnome.get("remote_extensions", []) == remote
+        ):
+            setup_metadata_text = original_metadata
+        else:
+            setup_metadata_text = _updated_gnome_selection(original_metadata, bundled, remote)
+        metadata_changed = setup_metadata_text != original_metadata
+
+    changed_dotfiles = [save for save in dotfile_saves if save["changed"]]
+    action = "would save" if dry_run else "saved"
+    for save in changed_dotfiles:
+        if not dry_run:
+            save["source"].write_bytes(save["content"])
+        print(f"-> {action} {save['display_target']} to {save['display_source']}")
+
+    if metadata_changed and setup_metadata_path is not None and setup_metadata_text is not None:
+        if not dry_run:
+            setup_metadata_path.write_text(setup_metadata_text)
+        print(f"-> {action} enabled GNOME extensions to {setup_metadata_path.relative_to(ROOT)}")
+
+    suffix = " (dry run)" if dry_run else ""
+    extension_status = "changed" if metadata_changed else "unchanged"
+    if setup_metadata_path is None:
+        extension_status = "not applicable"
+    summary_action = "would save" if dry_run else "saved"
+    print(
+        f"{summary_action} {len(changed_dotfiles)} of {len(dotfile_saves)} dotfiles; "
+        f"GNOME extensions {extension_status}{suffix}"
+    )
 
 
 def apply_settings(
