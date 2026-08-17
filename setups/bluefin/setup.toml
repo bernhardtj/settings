@@ -13,9 +13,15 @@ targets = []
 [gnome]
 extensions = [
   "settings-updatecheck@localhost",
-  "settings-notification-ticker@localhost"
+  "settings-notification-ticker@localhost",
 ]
 remote_extensions = [
+  "Panel_Favorites@rmy.pobox.com",
   "panel-workspace-scroll@polymeilex.github.io",
-  "status-icons@gnome-shell-extensions.gcampax.github.com",
+  "appindicatorsupport@rgcjonas.gmail.com",
+  "bazaar-integration@kolunmi.github.io",
+  "blur-my-shell@aunetx",
+  "caffeine@patapon.info",
+  "dash-to-dock@micxgx.gmail.com",
+  "transparent-top-bar@ftpix.com",
 ]

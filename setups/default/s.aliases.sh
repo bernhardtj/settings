@@ -22,6 +22,20 @@ export PATH
 export EDITOR=nvim
 export VISUAL=nvim
 
+# lesspipe emits ANSI color when less is configured to display it. It already
+# knows how to use bat, along with converters for archives and binary formats.
+case "${LESS-}" in
+*R* | *--RAW-CONTROL-CHARS*) ;;
+*) LESS="${LESS:+$LESS }-R" ;;
+esac
+export LESS
+if [[ -x /usr/bin/lesspipe.sh ]]; then
+    export LESSOPEN="${LESSOPEN:-||/usr/bin/lesspipe.sh %s}"
+    if command -v bat >/dev/null 2>&1; then
+        export LESSCOLORIZER="${LESSCOLORIZER:-bat}"
+    fi
+fi
+
 alias :q=exit
 alias q=exit
 

@@ -1,6 +1,8 @@
 # .config/kitty/kitty.conf
 # enabled_layouts grid
 font_family Fira Code
+italic_font JetBrains Mono Italic
+bold_italic_font JetBrains Mono Bold Italic
 font_size 12
 cursor_shape beam
 tab_bar_style slant
