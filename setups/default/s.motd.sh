@@ -1,10 +1,9 @@
 .local/bin/motd-update
 #!/bin/bash
 
-d30=2592000
+d="$(date -d "$(rpm-ostree status | sed -n '/Version/{s/^.*(\(.*\))$/\1/gp;q}')" +%s)"
+ago="$(("$(date +%s)" - d))"
 
-d=$(date -d "$(rpm-ostree status | sed -n '/Version/{s/^.*(\(.*\))$/\1/gp;q}')" +%s)
-
-if [[ $((d + d30)) -lt $(date +%s) ]]; then
+if [[ "$(("$ago" / 86400))" -gt 14 ]]; then
     printf "Notice: stale base image @%s\n" "$(date +%D -d "@$d")"
 fi
