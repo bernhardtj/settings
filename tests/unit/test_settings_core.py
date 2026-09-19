@@ -43,6 +43,79 @@ class SettingsCoreTests(unittest.TestCase):
         )
         self.assertIn(".bashrc", {setting["target"] for setting in plan["settings"]})
 
+    def test_default_installs_kitty_user_themes_and_applies_them_last(self) -> None:
+        plan = build_plan("default")
+        targets = {setting["target"] for setting in plan["settings"]}
+        post_scripts = [script["name"] for script in plan["scripts"]["post"]]
+
+        expected_themes = {
+            ".config/kitty/themes/Elementary Hera.conf",
+            ".config/kitty/themes/Elementary Loki.conf",
+            ".config/kitty/themes/GNOME Console Dark.conf",
+            ".config/kitty/themes/GNOME Console Light.conf",
+            ".config/kitty/themes/Hacker.conf",
+        }
+        self.assertTrue(expected_themes <= targets)
+        self.assertIn(".local/bin/kitty-themes", targets)
+        self.assertEqual(post_scripts[-1], "90-kitty-themes.sh")
+
+        kitty_setting = next(
+            setting for setting in plan["settings"] if setting["target"] == ".config/kitty/kitty.conf"
+        )
+        kitty_config = (ROOT / kitty_setting["path"]).read_text()
+        self.assertIn("wayland_titlebar_color background", kitty_config)
+        self.assertNotIn("light-theme.conf", kitty_config)
+        self.assertNotIn("dark-theme.conf", kitty_config)
+
+        theme_settings = [
+            setting for setting in plan["settings"] if setting["target"] in expected_themes
+        ]
+        for setting in theme_settings:
+            with self.subTest(theme=setting["target"]):
+                theme = (ROOT / setting["path"]).read_text()
+                self.assertIn("wayland_titlebar_color background", theme)
+
+    def test_kitty_theme_hook_generates_distinct_auto_theme_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            temp = Path(tmp)
+            bin_dir = temp / "bin"
+            config_dir = temp / "kitty"
+            bin_dir.mkdir()
+            kitten = bin_dir / "kitten"
+            kitten.write_text(
+                "#!/bin/sh\n"
+                "case \"$*\" in\n"
+                "  *Light) echo 'foreground #000000' ;;\n"
+                "  *Dark) echo 'foreground #ffffff' ;;\n"
+                "  *) exit 1 ;;\n"
+                "esac\n"
+            )
+            kitten.chmod(0o755)
+            env = os.environ.copy()
+            env["KITTY_CONFIG_DIRECTORY"] = str(config_dir)
+            env["PATH"] = f"{bin_dir}:{env['PATH']}"
+
+            subprocess.check_call(
+                ["bash", str(ROOT / "setups" / "default" / "90-kitty-themes.sh")],
+                env=env,
+            )
+
+            self.assertEqual(
+                (config_dir / "light-theme.auto.conf").read_text(),
+                "foreground #000000\n\nwayland_titlebar_color background\n",
+            )
+            self.assertEqual(
+                (config_dir / "dark-theme.auto.conf").read_text(),
+                "foreground #ffffff\n\nwayland_titlebar_color background\n",
+            )
+            no_preference = config_dir / "no-preference-theme.auto.conf"
+            self.assertTrue(no_preference.is_symlink())
+            self.assertEqual(os.readlink(no_preference), "light-theme.auto.conf")
+            self.assertEqual(
+                no_preference.read_text(),
+                "foreground #000000\n\nwayland_titlebar_color background\n",
+            )
+
     def test_bluefin_selects_gnome_extensions(self) -> None:
         plan = build_plan("bluefin")
         self.assertIn("settings-updatecheck@localhost", plan["gnome"]["extensions"])
